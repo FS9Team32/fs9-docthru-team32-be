@@ -1,0 +1,46 @@
+{
+  "name": "fs9-team32-docthru-be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.15.1",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon --env-file=.env src/server.js",
+    "seed": "node scripts/seed.js",
+    "format": "prettier --write .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js}": [
+      "prettier --write",
+      "eslint --fix --max-warnings=0"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.3",
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "@eslint/js": "^9.37.0",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.4",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
+    "prisma": "^6.16.3"
+  }
+}
