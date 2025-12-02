@@ -1,7 +1,7 @@
 import express from 'express';
 import authRouter from './auth.js';
 import challengesRouter from './challenges.js';
-import meChallengesRouter from './me.challenges.js';
+import userRouter from './user.js';
 import challengesWorksRouter from './challenges.works.js';
 import worksRouter from './works.js';
 import worksCommentsRouter from './works.comments.js';
@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
 });
 
 router.use('/', authRouter);
-router.use('/me/challenges', meChallengesRouter);
+router.use('/user', userRouter);
 router.use('/challenges', challengesRouter);
 router.use('/challenges/:challengesId/works', challengesWorksRouter);
 router.use('/works', worksRouter);
