@@ -13,7 +13,7 @@ async function createWork({ challengeId, workerId, content }) {
 async function findWorksListByChallengeId({
   challengeId,
   whereOptions = {},
-  orderBy = [],
+  orderByOptions = [],
   skip,
   take,
 }) {
@@ -33,7 +33,7 @@ async function findWorksListByChallengeId({
     }),
     prisma.work.findMany({
       where,
-      orderBy: [{ likeCount: 'desc' }, ...orderBy],
+      orderBy: [{ likeCount: 'desc' }, ...orderByOptions],
       ...pagination,
     }),
   ]);
