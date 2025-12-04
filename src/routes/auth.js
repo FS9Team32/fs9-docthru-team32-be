@@ -1,14 +1,8 @@
 import express from 'express';
-import { expressjwt } from "express-jwt";
 import authService from '../services/auth.service.js';
 import auth from "../middlewares/auth.js";
 
 const authRouter = express.Router();
-
-const verifyAccessToken = expressjwt({
-    secret: process.env.JWT_SECRET,
-    algorithms: ['HS256']
-});
 
 
 authRouter.post("/signup", async (req, res, next) => {
@@ -26,22 +20,29 @@ authRouter.post("/signup", async (req, res, next) => {
     }
 });
 
-
-authRouter.post ("/login", async(req, res, next) => {
-    const {email, password} = req.body;
+authRouter.post("/login", async (req, res, next) => {
+    const { email, password } = req.body;
     try {
-        if (!email || !password) {
-            const error = new Error ("Requires both email and Password");
-            error.code = 400;
-            throw error;
-        }
-        const user = await authService.getUser(email,password);
-        req.session.userId = user.id;
-        res.json(user);
+    if (!email || !password) {
+        const error = new Error("email, password 가 모두 필요합니다.");
+        error.code = 400;
+        throw error;
+    }
+    const user = await authService.getUser(email, password);
+
+    const accessToken = authService.createToken(user);
+    const refreshToken = authService.createToken(user, "refresh");
+    await authService.updateUser(user.id, { refreshToken });
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false,
+    });
+    res.json({ ...user, accessToken });
     } catch (error) {
         next(error);
     }
-})
+});
 
 authRouter.post(
     "/token/refresh",
@@ -54,8 +55,8 @@ authRouter.post(
             await authService.refreshToken(userId, refreshToken);
         res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true,
-            sameSite: "none",
-            secure: true,
+            sameSite: "lax",
+            secure: false,
             path: "/token/refresh",
         });
         return res.json({ accessToken: newAccessToken });

@@ -6,13 +6,13 @@ import { config, isDevelopment } from './config/config.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { disconnectDB } from './db/prisma.js';
 import { cors } from './middlewares/cors.js';
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cookieParser());
 app.use(cors);
 
 if (isDevelopment) {

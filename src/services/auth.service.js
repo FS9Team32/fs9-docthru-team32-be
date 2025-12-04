@@ -2,11 +2,17 @@ import bcrypt from "bcrypt";
 import authRepo from "../repository/auth.repo.js";
 import jwt from "jsonwebtoken"
 
+
+const JWT_SECRET = process.env.JWT_ACCESS_SECRET;
+const JWT_EXPIRES = process.env.JWT_TOKEN_EXPIRES_IN || "1h";
+const REFRESH_EXPIRES = process.env.REFRESH_TOKEN_EXPIRES_IN || "7d";
+
+
 async function createUser(user) {
     try{
         const existedUser = await authRepo.findByEmail(user.email);
         if (existedUser) {
-            const error = new Error("User already exists");
+            const error = new Error("Email Already Exists");
             error.code = 409;
             error.data = {email: user.email};
             throw error;
@@ -36,7 +42,7 @@ async function getUser(email, password) {
     try {
         const user = await authRepo.findByEmail(email);
     if (!user){
-            const error = new Error("Email does not exists");
+            const error = new Error("Email Does Not Exists");
             error.code = 401;
             throw error;
         }
@@ -53,7 +59,7 @@ async function getUser(email, password) {
     async function verifyPassword(inputPassword, password) {
     const isMatch = await bcrypt.compare(inputPassword, password);
     if (!isMatch) {
-        const error = new Error("비밀번호가 일치하지 않습니다.");
+        const error = new Error("Incorrect Password.");
         error.code = 401;
         throw error;
     }
@@ -61,8 +67,8 @@ async function getUser(email, password) {
 
 function createToken(user, type) {
     const payload = { userId: user.id };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: type === "refresh" ? "2w" : "1h",
+    const token = jwt.sign(payload, JWT_SECRET, {
+        expiresIn: type === "refresh" ? REFRESH_EXPIRES : JWT_EXPIRES,
     });
     return token;
 }
@@ -93,3 +99,4 @@ export default{
     createToken,
     refreshToken,
 };
+

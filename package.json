@@ -13,7 +13,8 @@
     "dev": "nodemon --env-file=.env src/server.js",
     "seed": "node scripts/seed.js",
     "format": "prettier --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "migrate": "prisma migrate deploy"
   },
   "lint-staged": {
     "*.{js}": [
@@ -27,7 +28,10 @@
   "dependencies": {
     "@prisma/client": "^6.16.3",
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
+    "express-jwt": "^8.5.1",
+    "express-session": "^1.18.2",
     "jsonwebtoken": "^9.0.2",
     "zod": "^4.1.12"
   },
