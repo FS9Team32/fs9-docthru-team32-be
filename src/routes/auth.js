@@ -9,7 +9,7 @@ authRouter.post("/signup", async (req, res, next) => {
     try {
         const { email, nickname, password } = req.body;
         if (!email || !nickname || !password) {
-        const error = new Error("email, nickname, password 가 모두 필요합니다.");
+        const error = new Error("All Input Is Required");
         error.code = 400;
         throw error;
         }
@@ -24,7 +24,7 @@ authRouter.post("/login", async (req, res, next) => {
     const { email, password } = req.body;
     try {
     if (!email || !password) {
-        const error = new Error("email, password 가 모두 필요합니다.");
+        const error = new Error("Email And Password Is Required");
         error.code = 400;
         throw error;
     }

@@ -59,7 +59,7 @@ async function getUser(email, password) {
     async function verifyPassword(inputPassword, password) {
     const isMatch = await bcrypt.compare(inputPassword, password);
     if (!isMatch) {
-        const error = new Error("Incorrect Password.");
+        const error = new Error("Incorrect Password");
         error.code = 401;
         throw error;
     }
