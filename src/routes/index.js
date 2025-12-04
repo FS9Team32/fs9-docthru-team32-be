@@ -1,7 +1,8 @@
 import express from 'express';
 import authRouter from './auth.js';
-import challengesRouter from './challenges.js';
 import userRouter from './user.js';
+import applicationsRouter from './applications.js';
+import challengesRouter from './challenges.js';
 import challengesWorksRouter from './challenges.works.js';
 import worksRouter from './works.js';
 import worksCommentsRouter from './works.comments.js';
@@ -20,11 +21,12 @@ router.get('/', (req, res) => {
 
 router.use('/', authRouter);
 router.use('/user', userRouter);
+router.use('/challenge-applications', applicationsRouter);
 router.use('/challenges', challengesRouter);
-router.use('/challenges/:challengesId/works', challengesWorksRouter);
+router.use('/challenges/:challengeId/works', challengesWorksRouter);
 router.use('/works', worksRouter);
-router.use('/works/:worksId/comments', worksCommentsRouter);
+router.use('/works/:workId/comments', worksCommentsRouter);
 router.use('/comments', commentsRouter);
-router.use('/works/:worksId/likes', worksLikesRouter);
+router.use('/works/:workId/likes', worksLikesRouter);
 
 export default router;
