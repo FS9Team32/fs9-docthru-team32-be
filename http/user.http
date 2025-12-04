@@ -19,4 +19,4 @@ Content-Type: application/json
 
 ###
 POST http://localhost:3000/token/refresh
-Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NDgxNTA1OSwiZXhwIjoxNzY2MDI0NjU5fQ._d5Pc-xx-pLbAEI1GMZMkt4-ZrrGKvbgIqOdqMspvsI
+Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NDgzMDM0NSwiZXhwIjoxNzY1NDM1MTQ1fQ.t813hUL6jMVDZeRals62pS0rmhdR43jsJ7p7X3xXGLQ
