@@ -19,7 +19,19 @@ async function createWork(workData) {
         );
       }
 
-      // 2. 현재 참가자 수 확인 (tx 전달)
+      // 2-1. 기참여 여부 확인 (tx 전달)
+      const [existingWorkCount] = await worksRepo.findWorksListByChallengeId(
+        {
+          challengeId: workData.challengeId,
+          whereOptions: { workerId: workData.workerId },
+        },
+        tx,
+      );
+      if (existingWorkCount > 0) {
+        throw new ConflictException('이미 참여한 챌린지입니다.');
+      }
+
+      // 2-2. 현재 참가자 수 확인 (tx 전달)
       const currentCount = await worksRepo.countWorksByChallengeId(
         workData.challengeId,
         tx,
