@@ -1,16 +1,14 @@
 import express from 'express';
 import authService from '../services/auth.service.js';
 import auth from '../middlewares/auth.js';
-
+import { BadRequestException } from '../err/badRequestException.js';
 const authRouter = express.Router();
 
 authRouter.post('/signup', async (req, res, next) => {
   try {
     const { email, nickname, password } = req.body;
     if (!email || !nickname || !password) {
-      const error = new Error('All Inputs Are Required');
-      error.code = 400;
-      throw error;
+      throw new BadRequestException('All Inputs Are Required');
     }
     const user = await authService.createUser({ email, nickname, password });
     res.status(201).json(user);
@@ -23,9 +21,7 @@ authRouter.post('/login', async (req, res, next) => {
   const { email, password } = req.body;
   try {
     if (!email || !password) {
-      const error = new Error('Email And Password Is Required');
-      error.code = 400;
-      throw error;
+      throw new BadRequestException('Email and Password is Required');
     }
     const user = await authService.getUser(email, password);
     const accessToken = authService.createToken(user);
