@@ -33,6 +33,14 @@ async function findWorksListByChallengeId({
     }),
     prisma.work.findMany({
       where,
+      include: {
+        worker: {
+          select: {
+            nickname: true,
+            role: true,
+          },
+        },
+      },
       orderBy: [{ likeCount: 'desc' }, ...orderByOptions],
       ...pagination,
     }),
@@ -46,7 +54,17 @@ async function findSelectedWorksCountByWorkerId(workerId) {
 }
 
 async function findWorkById(workId) {
-  return prisma.work.findUnique({ where: { id: Number(workId) } });
+  return prisma.work.findUnique({
+    where: { id: Number(workId) },
+    include: {
+      worker: {
+        select: {
+          nickname: true,
+          role: true,
+        },
+      },
+    },
+  });
 }
 
 async function updateWork({ workId, data }) {
