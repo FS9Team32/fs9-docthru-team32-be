@@ -3,6 +3,7 @@ import { worksRepo } from '../repository/works.repo.js';
 import { challengesRepo } from '../repository/challenges.repo.js';
 import { NotFoundException } from '../err/notFoundException.js';
 import { ConflictException } from '../err/conflictException.js';
+import { ForbiddenException } from '../err/forbiddenException.js';
 
 async function createWork(workData) {
   return await prisma.$transaction(
@@ -95,20 +96,28 @@ async function getWork(id) {
   return workData;
 }
 
-async function updateWork({ id, content }) {
-  await getWork(id);
+async function updateWork({ workId, userId, content }) {
+  const prevWork = await getWork(workId);
+
+  if (prevWork.workerId !== userId) {
+    throw new ForbiddenException('작업물을 수정할 권한이 없습니다.');
+  }
 
   const updatedWork = await worksRepo.updateWork({
-    workId: id,
+    workId,
     data: { content },
   });
   return updatedWork;
 }
 
-async function deleteWork(id) {
-  await getWork(id);
+async function deleteWork({ workId, userId }) {
+  const prevWork = await getWork(workId);
 
-  const deletedWork = await worksRepo.deleteWork(id);
+  if (prevWork.workerId !== userId) {
+    throw new ForbiddenException('작업물을 수정할 권한이 없습니다.');
+  }
+
+  const deletedWork = await worksRepo.deleteWork(workId);
   return deletedWork;
 }
 
