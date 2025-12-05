@@ -34,7 +34,7 @@ router.patch(
       const { userId } = req.auth; // 현재 로그인한 유저 ID
 
       const updatedWork = await worksServices.updateWork({
-        worksId: Number(workId),
+        workId: Number(workId),
         userId: Number(userId),
         content,
       });
