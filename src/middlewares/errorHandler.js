@@ -9,6 +9,9 @@ export const errorHandler = (error, req, res, _next) => {
       message: error.message,
     });
   }
+  if (error.name === 'UnauthorizedError') {
+    res.status(401).send('invalid token...');
+  }
 
   return res.status(500).json({
     success: false,
