@@ -34,9 +34,19 @@ router.post(
 router.get('/', async (req, res, next) => {
   try {
     const { challengeId } = req.params;
-    const { totalCount, rankedList: list } =
-      await worksServices.getChallengeWorksList(challengeId);
-    return { totalCount, list };
+    const { page, limit } = req.query;
+
+    const { totalCount, rankedList } =
+      await worksServices.getChallengeWorksList(Number(challengeId), {
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+      });
+
+    res.status(200).json({
+      success: true,
+      totalCount,
+      list: rankedList,
+    });
   } catch (err) {
     next(err);
   }

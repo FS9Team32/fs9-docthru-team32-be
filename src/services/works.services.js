@@ -57,29 +57,25 @@ async function createWork(workData) {
   );
 }
 
-async function getChallengeWorksList(challengeId) {
+async function getChallengeWorksList(challengeId, { page = 1, limit = 10 }) {
   // 1. 챌린지 존재 확인
-  const challenge = await worksRepo.findChallengeById(challengeId);
+  const challenge = await challengesRepo.findChallengeById(challengeId);
   if (!challenge) {
     throw new NotFoundException(
       '챌린지가 존재하지 않습니다. 다시 확인해 주세요.',
     );
   }
 
-  // 2. 목록 및 전체 개수 조회
-  const [totalCount, list] = await worksRepo.findWorksListByChallengeId({
-    challengeId,
-  });
+  const skip = (page - 1) * limit;
+  const take = limit;
 
-  // 3. 순위 부여 로직 (1, 1, 3 방식)
-  let currentRank = 1;
-  const rankedList = list.map((item, index) => {
-    // 첫 번째가 아니고, 이전 항목과 좋아요 수가 다르면 현재 인덱스+1을 순위로 설정
-    if (index > 0 && item.likeCount !== list[index - 1].likeCount) {
-      currentRank = index + 1;
-    }
-    return { ...item, rank: currentRank };
-  });
+  // 2. DB에서 순위가 계산된 작업물 목록을 페이지네이션하여 조회
+  const [totalCount, rankedList] =
+    await worksRepo.findWorksListWithRankByChallengeId({
+      challengeId,
+      skip,
+      take,
+    });
 
   return { totalCount, rankedList };
 }
