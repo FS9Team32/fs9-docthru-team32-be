@@ -50,10 +50,7 @@ authRouter.post(
   async (req, res, next) => {
     try {
       const { userId } = req.auth;
-      console.log('userId', userId);
       const refreshToken = req.cookies.refreshToken;
-
-      console.log('refreshToken', refreshToken);
       const { newAccessToken, newRefreshToken } =
         await authService.refreshToken(userId, refreshToken);
 

@@ -6,7 +6,7 @@ const envSchema = z.object({
     .default('development'),
   PORT: z.coerce.number().min(1000).max(65535),
   DATABASE_URL: z.string().startsWith('postgresql://'),
-  // FRONT_URL: z.string(),
+  FRONT_URL: z.string(),
 });
 
 const parseEnvironment = () => {
@@ -15,7 +15,7 @@ const parseEnvironment = () => {
       ENVIRONMENT: process.env.NODE_ENV,
       PORT: process.env.PORT,
       DATABASE_URL: process.env.DATABASE_URL,
-      // FRONT_URL: process.env.FRONT_URL,
+      FRONT_URL: process.env.FRONT_URL,
     });
   } catch (err) {
     if (err instanceof z.ZodError) {

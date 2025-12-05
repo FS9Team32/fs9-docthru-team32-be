@@ -1,52 +1,52 @@
-import { prisma } from "../db/prisma.js";
+import { prisma } from '../db/prisma.js';
 
 async function findById(id) {
-    return prisma.user.findUnique({
-        where: {
-        id,
-        },
-    });
+  return prisma.user.findUnique({
+    where: {
+      id,
+    },
+  });
 }
 
 async function findByEmail(email) {
-    return await prisma.user.findUnique({
-        where: {
-        email,
-        },
-    });
+  return await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
 }
 
 async function save(user) {
-    return prisma.user.create({
-        data: {
-        email: user.email,
-        nickname: user.nickname,
-        password: user.password,
-        },
-    });
+  return prisma.user.create({
+    data: {
+      email: user.email,
+      nickname: user.nickname,
+      password: user.password,
+    },
+  });
 }
 
 async function update(id, data) {
-    return prisma.user.update({
-        where: {
-        id,
-        },
-        data: data,
-    });
+  return prisma.user.update({
+    where: {
+      id,
+    },
+    data: data,
+  });
 }
 
 async function createOrUpdate(provider, providerId, email, nickname) {
-    return prisma.user.upsert({
-        where: { provider, providerId },
-        update: { email, nickname },
-        create: { provider, providerId, email, nickname },
-    });
+  return prisma.user.upsert({
+    where: { provider, providerId },
+    update: { email, nickname },
+    create: { provider, providerId, email, nickname },
+  });
 }
 
 export default {
-    findById,
-    findByEmail,
-    save,
-    update,
-    createOrUpdate,
+  findById,
+  findByEmail,
+  save,
+  update,
+  createOrUpdate,
 };

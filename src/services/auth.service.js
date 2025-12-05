@@ -24,14 +24,16 @@ async function createUser(user) {
     throw customError;
   }
 }
+
 function hashPassword(password) {
   return bcrypt.hash(password, 10);
 }
 
 function filterSensitiveUserData(user) {
-  const { password, ...rest } = user;
+  const { _password, _refreshToken, ...rest } = user;
   return rest;
 }
+
 async function getUser(email, password) {
   try {
     const user = await authRepo.findByEmail(email);
@@ -73,8 +75,6 @@ async function updateUser(id, data) {
 }
 
 async function refreshToken(userId, refreshToken) {
-  console.log('userId: ', userId);
-  console.log('refreshToken: ', refreshToken);
   const user = await authRepo.findById(userId);
   console.log('user: ', user);
   if (!user || user.refreshToken !== refreshToken) {

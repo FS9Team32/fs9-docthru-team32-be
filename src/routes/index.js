@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
   });
 });
 
-router.use('', authRouter);
+router.use('/auth', authRouter);
 router.use('/user', userRouter);
 router.use('/challenge-applications', applicationsRouter);
 router.use('/challenges', challengesRouter);
