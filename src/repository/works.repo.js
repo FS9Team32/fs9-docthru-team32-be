@@ -42,6 +42,7 @@ async function findWorksListByChallengeId(
       include: {
         worker: {
           select: {
+            id: true,
             nickname: true,
             role: true,
           },
@@ -74,6 +75,7 @@ async function findWorkById(workId, tx) {
     include: {
       worker: {
         select: {
+          id: true,
           nickname: true,
           role: true,
         },
