@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import authRepo from '../repository/auth.repo.js';
 import jwt from 'jsonwebtoken';
+import { config } from '../config/config.js';
 
 async function createUser(user) {
   try {
@@ -30,7 +31,7 @@ function hashPassword(password) {
 }
 
 function filterSensitiveUserData(user) {
-  const { _password, _refreshToken, ...rest } = user;
+  const { password: _password, refreshToken: _refreshToken, ...rest } = user;
   return rest;
 }
 
@@ -63,7 +64,7 @@ async function verifyPassword(inputPassword, password) {
 
 function createToken(user, type) {
   const payload = { userId: user.id };
-  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+  const token = jwt.sign(payload, config.JWT_SECRET, {
     expiresIn: type === 'refresh' ? '2w' : '1h',
   });
   return token;
@@ -76,7 +77,6 @@ async function updateUser(id, data) {
 
 async function refreshToken(userId, refreshToken) {
   const user = await authRepo.findById(userId);
-  console.log('user: ', user);
   if (!user || user.refreshToken !== refreshToken) {
     const error = new Error('Unauthorized');
     error.code = 401;
