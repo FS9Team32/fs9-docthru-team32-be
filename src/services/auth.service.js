@@ -2,15 +2,13 @@ import bcrypt from 'bcrypt';
 import authRepo from '../repository/auth.repo.js';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
+import { ConflictException } from '../err/conflictException.js';
 
 async function createUser(user) {
   try {
     const existedUser = await authRepo.findByEmail(user.email);
     if (existedUser) {
-      const error = new Error('Email Already Exists');
-      error.code = 409;
-      error.data = { email: user.email };
-      throw error;
+      throw new ConflictException('Email Already Exists');
     }
     const hashedPassword = await hashPassword(user.password);
     const createdUser = await authRepo.save({
