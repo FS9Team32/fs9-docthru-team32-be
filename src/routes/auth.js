@@ -8,7 +8,7 @@ authRouter.post('/signup', async (req, res, next) => {
   try {
     const { email, nickname, password } = req.body;
     if (!email || !nickname || !password) {
-      const error = new Error('All Input Is Required');
+      const error = new Error('All Inputs Are Required');
       error.code = 400;
       throw error;
     }
