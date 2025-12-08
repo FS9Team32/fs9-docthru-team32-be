@@ -17,8 +17,14 @@ async function getCommentsListByWorkId({
 }) {
   const queryOptions = {
     where: { workId: Number(workId) },
-    take: limit,
+    include: {
+      author: {
+        nickname: true,
+        role: true,
+      },
+    },
     orderBy: { createdAt: 'desc' },
+    take: limit,
   };
   if (cursorId) {
     queryOptions.cursor = { id: cursorId };
