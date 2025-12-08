@@ -26,7 +26,7 @@ async function getWorkCommentsList({ workId, limit, cursorId }) {
 }
 
 async function commentExistence(commentId) {
-  const comment = commentsRepo.getCommentById(commentId);
+  const comment = await commentsRepo.getCommentById(commentId);
   if (!comment) {
     throw new NotFoundException('댓글을 찾을 수 없습니다.');
   }
