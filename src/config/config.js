@@ -7,6 +7,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().min(1000).max(65535),
   DATABASE_URL: z.string().startsWith('postgresql://'),
   FRONT_URL: z.string(),
+  JWT_SECRET: z.string(),
 });
 
 const parseEnvironment = () => {
@@ -16,6 +17,7 @@ const parseEnvironment = () => {
       PORT: process.env.PORT,
       DATABASE_URL: process.env.DATABASE_URL,
       FRONT_URL: process.env.FRONT_URL,
+      JWT_SECRET: process.env.JWT_SECRET,
     });
   } catch (err) {
     if (err instanceof z.ZodError) {

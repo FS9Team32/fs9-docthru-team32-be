@@ -12,3 +12,128 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// 1. 유저 (User)
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  nickname     String
+  password     String
+  role         String   @default("NORMAL") //유저 등급 또는 권한: NORMAL, PRO, ADMIN
+  refreshToken String?  @map("refresh_token")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  ChallengeApplications ChallengeApplication[] @relation("UserAppliedChallenges")
+  CreatedChallenges     Challenge[]            @relation("UserCreatedChallenges")
+  works                 Work[]
+  comments              Comment[]
+  likes                 Like[]
+
+  @@map("users")
+}
+
+// 2-1. 신청서 (Challenge Application)
+model ChallengeApplication {
+  // 신청한 챌린지에 대한 정보
+  id               Int             @id @default(autoincrement())
+  creatorId        Int             @map("creator_id")
+  title            String
+  category         String
+  documentType     String          @map("document_type")
+  originalLink     String          @map("original_link")
+  description      String          @db.Text      
+  maxParticipants  Int             @default(1) @map("max_participants")
+  deadlineAt       DateTime        @map("deadline_at") //챌린지 마감일
+  // ---
+
+  status           String          @default("PENDING") //승인 상태 PENDING, APPROVED, REJECTED, DELETED
+  adminFeedback    String?         @map("admin_feedback") @db.Text
+  createdAt        DateTime        @default(now()) @map("created_at") //신청일
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  reviewedAt       DateTime?       @map("reviewed_at")
+
+  challenges       Challenge?
+  creator          User            @relation("UserAppliedChallenges", fields: [creatorId], references: [id])
+
+  @@index([status])
+  @@map("challenge_applications")
+}
+
+// 2-2. 챌린지 (Challenge)
+model Challenge {
+  id               Int             @id @default(autoincrement())
+  // 승인되어 공개된 챌린지에 대한 정보(신청서 정보와 동일)
+  applicationId    Int             @unique @map("application_id")
+  creatorId        Int             @map("creator_id")
+  title            String
+  category         String
+  documentType     String          @map("document_type")
+  originalLink     String          @map("original_link")
+  description      String          @db.Text   
+  maxParticipants  Int             @default(1) @map("max_participants")
+  deadlineAt       DateTime        @map("deadline_at") //챌린지 마감일
+  // ---
+
+  status           String          @default("RECRUITING") //진행 상태: RECRUITING, FILLED, CLOSED
+  createdAt        DateTime        @default(now()) @map("created_at") //승인일
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  application     ChallengeApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  creator         User                 @relation("UserCreatedChallenges", fields: [creatorId], references: [id])
+  works           Work[]
+
+  @@index([status])
+  @@map("challenges")
+}
+
+// 3. 작업물 (Work)
+model Work {
+  id          Int      @id @default(autoincrement())
+  challengeId Int      @map("challenge_id")
+  workerId    Int      @map("worker_id")
+  isSelected  Boolean  @default(false) @map("is_selected")
+  content     String   @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  worker    User      @relation(fields: [workerId], references: [id])
+  comments  Comment[]
+  likes     Like[]
+
+  @@unique([challengeId, workerId])
+  @@index([challengeId])
+  @@map("works")
+}
+
+// 4. 댓글 (Comment)
+model Comment {
+  id        Int      @id @default(autoincrement())
+  workId    Int      @map("work_id")
+  authorId  Int      @map("author_id")
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  work   Work @relation(fields: [workId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id])
+
+  @@map("comments")
+}
+
+// 5. 좋아요/추천 (Like)
+// N:M 관계의 중간 테이블 (Explicit Many-to-Many Relation)
+model Like {
+  id        Int      @id @default(autoincrement())
+  workId    Int      @map("work_id")
+  userId    Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  work Work @relation(fields: [workId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  // 복합 기본키 설정 (한 유저가 한 작업물에 중복 좋아요 방지)
+  @@unique([workId, userId])
+  @@map("work_likes")
+}
