@@ -1,27 +1,34 @@
 import express from 'express';
 import commentsServices from '../services/comments.services.js';
 import auth from '../middlewares/auth.js';
+import { validate } from '../middlewares/validate.js';
+import { commentsValidation } from '../validations/comments.validation.js';
 
 const router = express.Router({ mergeParams: true });
 
-router.post('/', auth.verifyAccessToken, async (req, res, next) => {
-  try {
-    const { workId } = req.params;
-    const { userId } = req.auth;
-    const { content } = req.body;
-    const newComment = await commentsServices.createComment({
-      workId: Number(workId),
-      userId,
-      content,
-    });
-    res.status(201).json({
-      success: true,
-      ...newComment,
-    });
-  } catch (err) {
-    next(err);
-  }
-});
+router.post(
+  '/',
+  auth.verifyAccessToken,
+  validate(commentsValidation, 'body'),
+  async (req, res, next) => {
+    try {
+      const { workId } = req.params;
+      const { userId } = req.auth;
+      const { content } = req.body;
+      const newComment = await commentsServices.createComment({
+        workId: Number(workId),
+        userId,
+        content,
+      });
+      res.status(201).json({
+        success: true,
+        ...newComment,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 router.get('/', async (req, res, next) => {
   try {
