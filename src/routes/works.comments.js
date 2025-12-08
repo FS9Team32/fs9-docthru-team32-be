@@ -1,6 +1,6 @@
 import express from 'express';
-import commentsServices from '../services/comments.services';
-import auth from '../middlewares/auth';
+import commentsServices from '../services/comments.services.js';
+import auth from '../middlewares/auth.js';
 
 const router = express.Router({ mergeParams: true });
 
@@ -28,11 +28,11 @@ router.get('/', async (req, res, next) => {
     const { workId } = req.params;
     const { limit, cursor } = req.query;
     const getListParams = {
-      workId,
-      limit,
+      workId: Number(workId),
+      limit: Number(limit),
     };
     if (cursor) {
-      getListParams.cursorId = cursor;
+      getListParams.cursorId = Number(cursor);
     }
     const commentList =
       await commentsServices.getWorkCommentsList(getListParams);
