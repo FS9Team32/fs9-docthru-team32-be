@@ -19,8 +19,10 @@ async function getCommentsListByWorkId({
     where: { workId: Number(workId) },
     include: {
       author: {
-        nickname: true,
-        role: true,
+        select: {
+          nickname: true,
+          role: true,
+        },
       },
     },
     orderBy: { createdAt: 'desc' },
