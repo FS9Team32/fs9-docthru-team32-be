@@ -3,6 +3,7 @@ import authRepo from '../repository/auth.repo.js';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
 import { ConflictException } from '../err/conflictException.js';
+import { UnauthorizedException } from '../err/unauthorizedException.js';
 
 async function createUser(user) {
   try {
@@ -17,7 +18,7 @@ async function createUser(user) {
     });
     return filterSensitiveUserData(createdUser);
   } catch (error) {
-    if (error.code === 409) throw error;
+    if (error.statusCode === 409) throw error;
     const customError = new Error('DB Error Accured');
     customError.code = 500;
     throw customError;
@@ -37,14 +38,12 @@ async function getUser(email, password) {
   try {
     const user = await authRepo.findByEmail(email);
     if (!user) {
-      const error = new Error('Email Does Not Exists');
-      error.code = 401;
-      throw error;
+      throw new ConflictException('Email Does Not Exists');
     }
     await verifyPassword(password, user.password);
     return filterSensitiveUserData(user);
   } catch (error) {
-    if (error.code === 401) throw error;
+    if (error.statusCode === 401) throw error;
     const customError = new Error('DB Error Accured');
     customError.code = 500;
     throw customError;
@@ -54,9 +53,7 @@ async function getUser(email, password) {
 async function verifyPassword(inputPassword, password) {
   const isMatch = await bcrypt.compare(inputPassword, password);
   if (!isMatch) {
-    const error = new Error('Incorrect Password');
-    error.code = 401;
-    throw error;
+    throw new UnauthorizedException('Incorrect Password');
   }
 }
 
@@ -76,9 +73,7 @@ async function updateUser(id, data) {
 async function refreshToken(userId, refreshToken) {
   const user = await authRepo.findById(userId);
   if (!user || user.refreshToken !== refreshToken) {
-    const error = new Error('Unauthorized');
-    error.code = 401;
-    throw error;
+    throw new UnauthorizedException('Unauthorized Error');
   }
 
   const newAccessToken = createToken(user);
