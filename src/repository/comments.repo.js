@@ -35,6 +35,10 @@ async function getCommentsListByWorkId({
   };
 }
 
+async function getCommentById(commentId) {
+  return prisma.comment.findUnique({ where: { id: Number(commentId) } });
+}
+
 async function updateComment({ commentId, data }) {
   return prisma.comment.update({ where: { id: Number(commentId) }, data });
 }
@@ -46,6 +50,7 @@ async function deleteComment(commentId) {
 export const commentsRepo = {
   createComment,
   getCommentsListByWorkId,
+  getCommentById,
   updateComment,
   deleteComment,
 };
