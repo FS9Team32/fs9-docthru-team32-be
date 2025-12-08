@@ -111,9 +111,14 @@ async function updateWork({ workId, userId, content }) {
     throw new ForbiddenException('작업물을 수정할 권한이 없습니다.');
   }
 
+  const data = {
+    content,
+    editedAt: new Date(),
+  };
+
   const updatedWork = await worksRepo.updateWork({
     workId,
-    data: { content },
+    data,
   });
   return updatedWork;
 }
