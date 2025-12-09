@@ -1,3 +1,3 @@
 // import { prisma } from '../db/prisma.js';
 
-export const applicationRepo = {};
+export const applicationsRepo = {};
