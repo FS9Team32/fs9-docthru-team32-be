@@ -59,20 +59,13 @@ async function getApplicationById({ applicationId }) {
 
 async function updateApplication({ applicationId, userId, data }, tx) {
   const db = tx || prisma;
-  console.log(
-    'service getApplicationById param:',
-    applicationId,
-    typeof applicationId,
-  );
 
   // 1) 존재 여부 확인
   const prev = await getApplicationById({ applicationId });
-
   // 2) 권한 체크
   if (prev.creator.id !== userId) {
     throw new ForbiddenException('신청서를 수정할 권한이 없습니다.');
   }
-
   // 3) 업데이트
   return applicationsRepo.updateApplication({ applicationId, data }, db);
 }
