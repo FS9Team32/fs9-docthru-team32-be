@@ -1,7 +1,7 @@
-import { likesRepo } from '../repository/likes.repo';
-import { worksRepo } from '../repository/works.repo';
-import { NotFoundException } from '../err/notFoundException';
-import { ConflictException } from '../err/conflictException';
+import { likesRepo } from '../repository/likes.repo.js';
+import { worksRepo } from '../repository/works.repo.js';
+import { NotFoundException } from '../err/notFoundException.js';
+import { ConflictException } from '../err/conflictException.js';
 
 async function createLike({ workId, userId }) {
   const work = await worksRepo.findWorkById(workId);
