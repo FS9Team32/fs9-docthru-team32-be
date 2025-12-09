@@ -43,7 +43,7 @@ async function createOrUpdate(provider, providerId, email, nickname) {
   });
 }
 
-export default {
+export const authRepo = {
   findById,
   findByEmail,
   save,

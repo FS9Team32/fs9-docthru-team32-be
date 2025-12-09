@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import authRepo from '../repository/auth.repo.js';
+import { authRepo } from '../repository/auth.repo.js';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
 import { ConflictException } from '../err/conflictException.js';
@@ -18,7 +18,7 @@ async function createUser(user) {
     });
     return filterSensitiveUserData(createdUser);
   } catch (error) {
-    if (error.statusCode === 409) throw error;
+    if (error.code === 409) throw error;
     const customError = new Error('DB Error Accured');
     customError.code = 500;
     throw customError;
@@ -43,7 +43,7 @@ async function getUser(email, password) {
     await verifyPassword(password, user.password);
     return filterSensitiveUserData(user);
   } catch (error) {
-    if (error.statusCode === 401) throw error;
+    if (error.code === 401) throw error;
     const customError = new Error('DB Error Accured');
     customError.code = 500;
     throw customError;

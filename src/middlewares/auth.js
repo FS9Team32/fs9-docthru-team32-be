@@ -16,7 +16,7 @@ function validateEmailAndPassword(req, res, next) {
   const { email, password } = req.body;
   if (!email || !password) {
     const error = new Error('All Inputs Are Required');
-    error.statusCode = 422;
+    error.code = 422;
     throw error;
   }
   next();
