@@ -1,5 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import pkg from '@prisma/client';
 import { isDevelopment } from '../config/config.js';
+const { PrismaClient } = pkg;
 
 const getPrismaLogLevel = () => {
   if (!isDevelopment) {

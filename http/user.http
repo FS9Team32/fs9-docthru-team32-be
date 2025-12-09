@@ -1,4 +1,4 @@
-POST http://localhost:3000/auth/signup
+POST http://localhost:5000/auth/signup
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 
 
 ###
-POST http://localhost:3000/auth/login
+POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
@@ -18,5 +18,5 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/auth/token/refresh
+POST http://localhost:5000/auth/token/refresh
 Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NTE1NTExNywiZXhwIjoxNzY2MzY0NzE3fQ.HikuO1HrTTWjRitTHzCd5mjC2LhK-4Xe_lYTSVmVaqE
