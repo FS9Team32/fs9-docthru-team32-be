@@ -6,23 +6,18 @@ import { ConflictException } from '../err/conflictException.js';
 import { UnauthorizedException } from '../err/unauthorizedException.js';
 
 async function createUser(user) {
-  try {
-    const existedUser = await authRepo.findByEmail(user.email);
-    if (existedUser) {
-      throw new ConflictException('Email Already Exists');
-    }
-    const hashedPassword = await hashPassword(user.password);
-    const createdUser = await authRepo.save({
-      ...user,
-      password: hashedPassword,
-    });
-    return filterSensitiveUserData(createdUser);
-  } catch (error) {
-    if (error.statusCode === 409) throw error;
-    const customError = new Error('DB Error Accured');
-    customError.code = 500;
-    throw customError;
+  const existedUser = await authRepo.findByEmail(user.email);
+  if (existedUser) {
+    throw new ConflictException('Email Already Exists');
   }
+
+  const hashedPassword = await hashPassword(user.password);
+  const createdUser = await authRepo.save({
+    ...user,
+    password: hashedPassword,
+  });
+
+  return filterSensitiveUserData(createdUser);
 }
 
 function hashPassword(password) {
@@ -35,19 +30,13 @@ function filterSensitiveUserData(user) {
 }
 
 async function getUser(email, password) {
-  try {
-    const user = await authRepo.findByEmail(email);
-    if (!user) {
-      throw new ConflictException('Email Does Not Exists');
-    }
-    await verifyPassword(password, user.password);
-    return filterSensitiveUserData(user);
-  } catch (error) {
-    if (error.statusCode === 401) throw error;
-    const customError = new Error('DB Error Accured');
-    customError.code = 500;
-    throw customError;
+  const user = await authRepo.findByEmail(email);
+  if (!user) {
+    throw new UnauthorizedException('Email Does Not Exist');
   }
+
+  await verifyPassword(password, user.password);
+  return filterSensitiveUserData(user);
 }
 
 async function verifyPassword(inputPassword, password) {
@@ -58,11 +47,14 @@ async function verifyPassword(inputPassword, password) {
 }
 
 function createToken(user, type) {
-  const payload = { userId: user.id };
-  const token = jwt.sign(payload, config.JWT_SECRET, {
+  const payload = {
+    userId: user.id,
+    role: user.role,
+  };
+
+  return jwt.sign(payload, config.JWT_SECRET, {
     expiresIn: type === 'refresh' ? '2w' : '1h',
   });
-  return token;
 }
 
 async function updateUser(id, data) {
