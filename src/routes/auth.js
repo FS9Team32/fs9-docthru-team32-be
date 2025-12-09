@@ -11,7 +11,15 @@ authRouter.post('/signup', async (req, res, next) => {
       throw new BadRequestException('All Inputs Are Required');
     }
     const user = await authService.createUser({ email, nickname, password });
-    res.status(201).json(user);
+    const accessToken = authService.createToken(user);
+    const refreshToken = authService.createToken(user, 'refresh');
+    await authService.updateUser(user.id, { refreshToken });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: false,
+    });
+    res.status(201).json({ ...user, accessToken });
   } catch (error) {
     next(error);
   }
@@ -24,11 +32,9 @@ authRouter.post('/login', async (req, res, next) => {
       throw new BadRequestException('Email and Password is Required');
     }
     const user = await authService.getUser(email, password);
-    const accessToken = authService.createToken(user);
     const refreshToken = authService.createToken(user, 'refresh');
-
+    const accessToken = authService.createToken(user);
     await authService.updateUser(user.id, { refreshToken });
-
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'lax',

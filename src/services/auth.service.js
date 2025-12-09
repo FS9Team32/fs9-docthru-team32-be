@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import authRepo from '../repository/auth.repo.js';
+import { authRepo } from '../repository/auth.repo.js';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
 import { ConflictException } from '../err/conflictException.js';
