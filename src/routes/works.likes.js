@@ -1,13 +1,20 @@
 import express from 'express';
 import likeServices from '../services/like.services.js';
 import auth from '../middlewares/auth.js';
+import { ForbiddenException } from '../err/forbiddenException.js'; // Assuming this custom error class exists or will be created
 
 const router = express.Router({ mergeParams: true });
-//TODO. 유저 role이 ADMIN이면 거부
 router.post('/', auth.verifyAccessToken, async (req, res, next) => {
   try {
     const { workId } = req.params;
-    const { userId } = req.auth;
+    const { userId, role } = req.auth;
+
+    if (role === 'ADMIN') {
+      throw new ForbiddenException(
+        '관리자는 작업물에 좋아요 반응을 남길 수 없습니다.',
+      );
+    }
+
     await likeServices.createLike({
       workId: Number(workId),
       userId: Number(userId),
@@ -23,7 +30,14 @@ router.post('/', auth.verifyAccessToken, async (req, res, next) => {
 router.delete('/', auth.verifyAccessToken, async (req, res, next) => {
   try {
     const { workId } = req.params;
-    const { userId } = req.auth;
+    const { userId, role } = req.auth;
+
+    if (role === 'ADMIN') {
+      throw new ForbiddenException(
+        '관리자는 작업물에 좋아요 반응을 남길 수 없습니다.',
+      );
+    }
+
     await likeServices.deleteLike({
       workId: Number(workId),
       userId: Number(userId),
