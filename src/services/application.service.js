@@ -47,7 +47,7 @@ async function deleteApplication({ applicationId, userId }) {
   return applicationsRepo.deleteApplication({ applicationId });
 }
 
-async function getApplicationsList({ userId, query }) {
+async function getApplicationsListForUser({ userId, query }) {
   const {
     page = 1,
     pageSize = 10,
@@ -59,9 +59,10 @@ async function getApplicationsList({ userId, query }) {
   } = query;
 
   const skip = (page - 1) * pageSize;
+  const orderBy = orderby ? { [orderby]: 'desc' } : { createdAt: 'desc' };
 
   const where = {
-    creatorId: userId,
+    creatorId: userId, // 본인 데이터만
     ...(status && { status }),
     ...(category && { category }),
     ...(type && { documentType: type }),
@@ -74,7 +75,46 @@ async function getApplicationsList({ userId, query }) {
     }),
   };
 
+  const [totalCount, list] = await applicationsRepo.findApplicationsList({
+    where,
+    skip,
+    take: pageSize,
+    orderBy,
+  });
+
+  return {
+    totalCount,
+    page,
+    pageSize,
+    list,
+  };
+}
+export async function getApplicationsListForAdmin({ query }) {
+  const {
+    page = 1,
+    pageSize = 10,
+    status,
+    category,
+    type,
+    orderby,
+    keyword,
+  } = query;
+
+  const skip = (page - 1) * pageSize;
   const orderBy = orderby ? { [orderby]: 'desc' } : { createdAt: 'desc' };
+
+  const where = {
+    ...(status && { status }),
+    ...(category && { category }),
+    ...(type && { documentType: type }),
+    ...(keyword && {
+      OR: [
+        { title: { contains: keyword, mode: 'insensitive' } },
+        { description: { contains: keyword, mode: 'insensitive' } },
+        { category: { contains: keyword, mode: 'insensitive' } },
+      ],
+    }),
+  };
 
   const [totalCount, list] = await applicationsRepo.findApplicationsList({
     where,
@@ -134,7 +174,8 @@ async function rejectApplication(applicationId, adminFeedback) {
 
 export default {
   createApplication,
-  getApplicationsList,
+  getApplicationsListForUser,
+  getApplicationsListForAdmin,
   getMyApplications,
   getApplicationById,
   updateApplication,

@@ -38,15 +38,15 @@ router.post(
 router.get(
   '/',
   auth.verifyAccessToken,
+  // auth.requireAdmin,   // ← 이거 하나만 추가!
   validate(applicationsQueryValidation, 'query'),
   async (req, res, next) => {
     try {
-      const { userId } = req.auth;
       const query = req.query;
-      const data = await applicationService.getApplicationsList({
-        userId,
+      const data = await applicationService.getApplicationsListForAdmin({
         query,
       });
+
       res.status(200).json({
         success: true,
         ...data,

@@ -67,12 +67,6 @@ async function findApplicationsList({ where, skip, take, orderBy }, tx) {
 }
 
 async function updateApplication({ applicationId, data }, tx) {
-  console.log(
-    'repo findApplicationByApplicationId param:',
-    applicationId,
-    Number(applicationId),
-  );
-
   const db = tx || prisma;
   return db.challengeApplication.update({
     where: { id: Number(applicationId) },
