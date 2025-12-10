@@ -6,61 +6,8 @@ import { prisma } from '../db/prisma.js';
 
 async function createApplication(data, tx) {
   const db = tx || prisma;
-
-  const dto = {
-    creatorId: Number(data.creatorId),
-    title: data.title,
-    category: data.category,
-    documentType: data.documentType,
-    originalLink: data.originalLink,
-    description: data.description,
-    maxParticipants:
-      data.maxParticipants !== undefined ? Number(data.maxParticipants) : 1,
-    status: 'PENDING',
-    deadlineAt: data.deadlineAt ? new Date(data.deadlineAt) : null,
-  };
-
-  return db.challengeApplication.create({
-    data: {
-      ...dto,
-    },
-  });
+  return db.challengeApplication.create({ data });
 }
-
-// async function findApplicationsList(
-//   { whereOptions = {}, orderByOptions = [], skip, take },
-//   tx,
-// ) {
-//   const db = tx || prisma;
-
-//   const pagination = {
-//     ...(skip !== undefined && { skip }),
-//     ...(take !== undefined && { take }),
-//   };
-
-//   return Promise.all([
-//     db.ChallengeApplication.count({
-//       where: { whereOptions },
-//     }),
-//     db.ChallengeApplication.findMany({
-//       where: { whereOptions },
-//       include: {
-//         creator: {
-//           select: {
-//             id: true,
-//             nickname: true,
-//             role: true,
-//           },
-//         },
-//       },
-//       orderBy: { orderByOptions },
-//       ...pagination,
-//     }),
-//   ]);
-// }
-
-// 신청서 조회./ 수정 / 삭제
-
 async function findApplicationsByUserId({ userId }, tx) {
   const db = tx || prisma;
   return db.ChallengeApplication.findUnique({
@@ -94,6 +41,31 @@ async function findApplicationByApplicationId({ applicationId }, tx) {
   });
 }
 
+async function findApplicationsList({ where, skip, take, orderBy }, tx) {
+  const db = tx || prisma;
+  const [totalCount, list] = await Promise.all([
+    db.challengeApplication.count({ where }),
+    db.challengeApplication.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include: {
+        creator: {
+          select: {
+            id: true,
+            nickname: true,
+            role: true,
+          },
+        },
+        challenges: true,
+      },
+    }),
+  ]);
+
+  return [totalCount, list];
+}
+
 async function updateApplication({ applicationId, data }, tx) {
   console.log(
     'repo findApplicationByApplicationId param:',
@@ -118,7 +90,7 @@ async function deleteApplication({ applicationId }, tx) {
 
 export const applicationsRepo = {
   createApplication,
-  // findApplicationsList,
+  findApplicationsList,
   findApplicationsByUserId,
   findApplicationByApplicationId,
   updateApplication,

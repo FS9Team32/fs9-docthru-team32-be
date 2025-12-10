@@ -1,16 +1,12 @@
-###
-# 1. 내 정보 조회
-GET http://localhost:3000/user/me/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NTI2MDIzMSwiZXhwIjoxNzY1MjYzODMxfQ.HcY3H8pSkzBW7-T8InMTTe4AAnf8UIf_HZL68pbU1-E
 
 ###
 # 2-1. 챌린지 신청서 생성
 POST http://localhost:3000/challenge-applications
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NTI2MDIzMSwiZXhwIjoxNzY1MjYzODMxfQ.HcY3H8pSkzBW7-T8InMTTe4AAnf8UIf_HZL68pbU1-E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjUzNDI5NjIsImV4cCI6MTc2NTM0NjU2Mn0.aTsmd5sBOcIOlkukZHJcRqSj-3qkgbMJCDSENXX3Xmc
 Content-Type: application/json
 
 {
-  "title": "Next.js 공식문서 챌린지",
+  "title": "Next.js text 공식문서 챌린지",
   "category": "Next.js",
   "documentType": "official",
   "originalLink": "https://nextjs.org/docs",
@@ -20,23 +16,19 @@ Content-Type: application/json
 }
 
 ###
-# 2-2. 신청서 목록 조회 (관리자)
+# 2-2. 신청서 목록 조회
 GET http://localhost:3000/challenge-applications?page=1&limit=10&status=PENDING
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NTI2MDIzMSwiZXhwIjoxNzY1MjYzODMxfQ.HcY3H8pSkzBW7-T8InMTTe4AAnf8UIf_HZL68pbU1-E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjUzNDI5NjIsImV4cCI6MTc2NTM0NjU2Mn0.aTsmd5sBOcIOlkukZHJcRqSj-3qkgbMJCDSENXX3Xmc
 
 ###
-# 2-3. 내 신청서 목록 조회
-GET http://localhost:3000/challenge-applications/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NTI2MDIzMSwiZXhwIjoxNzY1MjYzODMxfQ.HcY3H8pSkzBW7-T8InMTTe4AAnf8UIf_HZL68pbU1-E
-###
 # 2-4. 신청서 상세 조회
-GET http://localhost:3000/challenge-applications/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NTI2MDIzMSwiZXhwIjoxNzY1MjYzODMxfQ.HcY3H8pSkzBW7-T8InMTTe4AAnf8UIf_HZL68pbU1-E
+GET http://localhost:3000/challenge-applications/27
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjUzNDI5NjIsImV4cCI6MTc2NTM0NjU2Mn0.aTsmd5sBOcIOlkukZHJcRqSj-3qkgbMJCDSENXX3Xmc
 
 ###
 # 2-5. 신청서 수정
-PATCH http://localhost:3000/challenge-applications/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NTI2MDIzMSwiZXhwIjoxNzY1MjYzODMxfQ.HcY3H8pSkzBW7-T8InMTTe4AAnf8UIf_HZL68pbU1-E
+PATCH http://localhost:3000/challenge-applications/27
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjUzNDI5NjIsImV4cCI6MTc2NTM0NjU2Mn0.aTsmd5sBOcIOlkukZHJcRqSj-3qkgbMJCDSENXX3Xmc
 Content-Type: application/json
 
 {
@@ -51,19 +43,5 @@ Content-Type: application/json
 
 ###
 # 2-6. 신청서 삭제
-DELETE http://localhost:3000/challenge-applications/20
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NTI2MDIzMSwiZXhwIjoxNzY1MjYzODMxfQ.HcY3H8pSkzBW7-T8InMTTe4AAnf8UIf_HZL68pbU1-E
-###
-# 2-7. 신청서 승인 (관리자)
-PATCH http://localhost:3000/challenge-applications/1/approve
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NTI2MDIzMSwiZXhwIjoxNzY1MjYzODMxfQ.HcY3H8pSkzBW7-T8InMTTe4AAnf8UIf_HZL68pbU1-E
-
-###
-# 2-8. 신청서 거절 (관리자)
-PATCH http://localhost:3000/challenge-applications/1/reject
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NTI2MDIzMSwiZXhwIjoxNzY1MjYzODMxfQ.HcY3H8pSkzBW7-T8InMTTe4AAnf8UIf_HZL68pbU1-E
-Content-Type: application/json
-
-{
-  "adminFeedback": "카테고리가 적절하지 않습니다."
-}
+DELETE http://localhost:3000/challenge-applications/27
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjUzNDI5NjIsImV4cCI6MTc2NTM0NjU2Mn0.aTsmd5sBOcIOlkukZHJcRqSj-3qkgbMJCDSENXX3Xmc

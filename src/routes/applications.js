@@ -2,50 +2,60 @@
 import express from 'express';
 import applicationService from '../services/application.service.js';
 import auth from '../middlewares/auth.js';
-import { applicationsPatchValidation } from '../validations/applications.validation.js';
+import {
+  applicationsValidation,
+  applicationsPatchValidation,
+  applicationsQueryValidation,
+} from '../validations/applications.validation.js';
 import { validate } from '../middlewares/validate.js';
 
 const router = express.Router();
 
-router.post('/', auth.verifyAccessToken, async (req, res, next) => {
-  try {
-    const { userId } = req.auth;
-    const {
-      title,
-      category,
-      documentType,
-      originalLink,
-      description,
-      maxParticipants,
-      deadlineAt,
-    } = req.body;
+router.post(
+  '/',
+  auth.verifyAccessToken,
+  validate(applicationsValidation),
+  async (req, res, next) => {
+    try {
+      const { userId } = req.auth;
+      const data = req.body;
+      const dto = {
+        creatorId: Number(userId),
+        ...data,
+      };
 
-    if (!title || !category || !documentType) {
-      return res.status(400).json({
-        success: false,
-        message: 'title, category, documentType are required',
+      const created = await applicationService.createApplication(dto);
+      res.status(200).json({
+        success: true,
+        application: created,
       });
+    } catch (err) {
+      next(err);
     }
+  },
+);
 
-    const dto = {
-      creatorId: Number(userId),
-      title,
-      category,
-      documentType,
-      originalLink,
-      description,
-      maxParticipants: maxParticipants ? Number(maxParticipants) : 1,
-      deadlineAt: deadlineAt ? new Date(deadlineAt) : null,
-    };
-
-    const created = await applicationService.createApplication(dto);
-    return res.status(201).json({ success: true, application: created });
-  } catch (err) {
-    next(err);
-  }
-});
-
-//GET /challenge-applications/:applicationId
+router.get(
+  '/',
+  auth.verifyAccessToken,
+  validate(applicationsQueryValidation, 'query'),
+  async (req, res, next) => {
+    try {
+      const { userId } = req.auth;
+      const query = req.query;
+      const data = await applicationService.getApplicationsList({
+        userId,
+        query,
+      });
+      res.status(200).json({
+        success: true,
+        ...data,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 router.get(
   '/:applicationId',
@@ -53,7 +63,6 @@ router.get(
   async (req, res, next) => {
     try {
       const { applicationId } = req.params;
-
       const application = await applicationService.getApplicationById({
         applicationId: Number(applicationId),
       });
@@ -80,14 +89,12 @@ router.patch(
       Object.keys(data).forEach(
         (key) => data[key] === undefined && delete data[key],
       );
-
       const updated = await applicationService.updateApplication({
         applicationId: Number(applicationId),
         userId: Number(userId),
         data,
       });
-
-      return res.status(200).json({
+      res.status(200).json({
         success: true,
         application: updated,
       });
@@ -102,8 +109,8 @@ router.delete(
   auth.verifyAccessToken,
   async (req, res, next) => {
     try {
-      const { applicationId } = req.params; // URL에서 application ID
-      const { userId } = req.auth; // 인증된 userId
+      const { applicationId } = req.params;
+      const { userId } = req.auth;
 
       await applicationService.deleteApplication({
         applicationId: Number(applicationId),

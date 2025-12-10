@@ -42,3 +42,16 @@ export const applicationsValidation = z.object({
     .nullable(),
 });
 export const applicationsPatchValidation = applicationsValidation.partial();
+
+export const applicationsQueryValidation = z.object({
+  page: z.coerce.number().min(1).default(1).optional(),
+  pageSize: z.coerce.number().min(1).max(100).default(10).optional(),
+
+  status: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
+  category: z.string().optional(),
+  type: z.string().optional(),
+
+  orderby: z.string().optional(),
+
+  keyword: z.string().optional(),
+});
