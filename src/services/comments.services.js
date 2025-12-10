@@ -1,7 +1,7 @@
-import { NotFoundException } from '../err/notFoundException.js';
-import { UnauthorizedException } from '../err/unauthorizedException.js';
 import { commentsRepo } from '../repository/comments.repo.js';
 import { worksRepo } from '../repository/works.repo.js';
+import { NotFoundException } from '../err/notFoundException.js';
+import { isAuthorized } from '../utils/permission.js';
 
 async function workExistece(workId) {
   const work = await worksRepo.findWorkById(workId);
@@ -33,24 +33,16 @@ async function commentExistence(commentId) {
   return comment;
 }
 
-async function updateComment({ commentId, userId, content }) {
+async function updateComment({ commentId, userId, role, content }) {
   const comment = await commentExistence(commentId);
-  if (userId !== comment.authorId) {
-    throw new UnauthorizedException(
-      '댓글의 작성자가 아니기 때문에 수정할 수 없습니다.',
-    );
-  }
+  isAuthorized(comment.workId, userId, role);
   const data = { content };
   return commentsRepo.updateComment({ commentId, data });
 }
 
-async function deleteComment({ commentId, userId }) {
+async function deleteComment({ commentId, userId, role }) {
   const comment = await commentExistence(commentId);
-  if (userId !== comment.authorId) {
-    throw new UnauthorizedException(
-      '댓글의 작성자가 아니기 때문에 삭제할 수 없습니다.',
-    );
-  }
+  isAuthorized(comment.workId, userId, role);
   return commentsRepo.deleteComment(commentId);
 }
 
