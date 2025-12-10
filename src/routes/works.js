@@ -25,17 +25,18 @@ router.get('/:workId', async (req, res, next) => {
 // 수정
 router.patch(
   '/:workId',
-  auth.verifyAccessToken, // 로그인 필요
+  auth.verifyAccessToken,
   validate(worksValidation, 'body'),
   async (req, res, next) => {
     try {
-      const { workId } = req.params;
+      const { workId, role } = req.params;
       const { content } = req.body;
       const { userId } = req.auth; // 현재 로그인한 유저 ID
 
       const updatedWork = await worksServices.updateWork({
         workId: Number(workId),
         userId: Number(userId),
+        role,
         content,
       });
 
@@ -50,26 +51,23 @@ router.patch(
 );
 
 // 삭제
-router.delete(
-  '/:workId',
-  auth.verifyAccessToken, // 로그인 필요
-  async (req, res, next) => {
-    try {
-      const { workId } = req.params;
-      const { userId } = req.auth;
-      const deletedWork = await worksServices.deleteWork({
-        workId: Number(workId),
-        userId: Number(userId),
-      });
+router.delete('/:workId', auth.verifyAccessToken, async (req, res, next) => {
+  try {
+    const { workId, role } = req.params;
+    const { userId } = req.auth;
+    const deletedWork = await worksServices.deleteWork({
+      workId: Number(workId),
+      userId: Number(userId),
+      role,
+    });
 
-      res.status(200).json({
-        success: true,
-        ...deletedWork,
-      });
-    } catch (err) {
-      next(err);
-    }
-  },
-);
+    res.status(200).json({
+      success: true,
+      ...deletedWork,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 export default router;

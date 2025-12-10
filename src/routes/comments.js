@@ -13,11 +13,12 @@ router.patch(
   async (req, res, next) => {
     try {
       const { commentId } = req.params;
-      const { userId } = req.auth;
+      const { userId, role } = req.auth;
       const { content } = req.body;
       const updatedComment = await commentsServices.updateComment({
         commentId: Number(commentId),
         userId,
+        role,
         content,
       });
       res.status(200).json({
@@ -33,10 +34,11 @@ router.patch(
 router.delete('/:commentId', auth.verifyAccessToken, async (req, res, next) => {
   try {
     const { commentId } = req.params;
-    const { userId } = req.auth;
+    const { userId, role } = req.auth;
     const deletedComment = await commentsServices.deleteComment({
       commentId: Number(commentId),
       userId,
+      role,
     });
     res.status(200).json({
       success: true,

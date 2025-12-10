@@ -37,9 +37,7 @@ function forbidAdmin(req, res, next) {
   const { role } = req.auth;
 
   if (role === 'ADMIN') {
-    throw new ForbiddenException(
-      '관리자 권한은 해당 동작을 수핼할 수 없습니다.',
-    );
+    throw new ForbiddenException('관리자는 해당 동작을 수행할 수 없습니다.');
   }
 
   next();
