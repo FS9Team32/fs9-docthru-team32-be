@@ -90,7 +90,7 @@ async function main() {
       creatorId: normalUser3.id,
       title: '개인 일기장 번역하기', // 부적절한 주제 예시
       category: 'Career',
-      documentType: '블로그',
+      documentType: 'Blog',
       originalLink: 'https://personal-blog.com/diary/1',
       description: '제 일기를 영어로 번역하고 싶습니다.',
       maxParticipants: 1,
@@ -108,7 +108,7 @@ async function main() {
         creatorId: normalUser1.id,
         title: 'React 19 공식문서 번역 챌린지',
         category: 'Web',
-        documentType: '공식문서',
+        documentType: 'Official',
         originalLink:
           'https://react.dev/blog/2024/04/25/react-19-upgrade-guide',
         description:
@@ -121,7 +121,7 @@ async function main() {
         creatorId: normalUser2.id,
         title: 'Vue.js 3 Composition API 정복',
         category: 'Modern JS',
-        documentType: '공식문서',
+        documentType: 'Official',
         originalLink: 'https://vuejs.org/guide/introduction.html',
         description: 'Vue 3의 새로운 문법을 완벽하게 이해해봅시다.',
         maxParticipants: 4,
@@ -138,7 +138,7 @@ async function main() {
       creatorId: proUser1.id,
       title: 'Next.js App Router 딥다이브',
       category: 'Next.js',
-      documentType: '블로그',
+      documentType: 'Blog',
       originalLink:
         'https://nextjs.org/docs/app/building-your-application/routing',
       description: 'App Router의 핵심 개념을 완벽하게 번역하고 정리합니다.',
@@ -154,7 +154,7 @@ async function main() {
       creatorId: proUser2.id,
       title: 'TypeScript 5.0 핸드북 스터디',
       category: 'Web',
-      documentType: '공식문서',
+      documentType: 'Official',
       originalLink:
         'https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-0.html',
       description: '타입스크립트 5.0의 데코레이터와 새로운 기능을 번역합니다.',
