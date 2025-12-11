@@ -38,7 +38,7 @@ router.post(
 router.get(
   '/',
   auth.verifyAccessToken,
-  // auth.requireAdmin,   // ← 이거 하나만 추가!
+  auth.requireAdmin,
   validate(applicationsQueryValidation, 'query'),
   async (req, res, next) => {
     try {
@@ -76,23 +76,22 @@ router.get(
   },
 );
 
+// PATCH /challenge-application/applicationsId == 상태 수정, 피드백 전달
+// 에 관련된 patch (어드민 권한)
+
 router.patch(
   '/:applicationId',
   auth.verifyAccessToken,
+  auth.requireAdmin,
   validate(applicationsPatchValidation, 'body'),
   async (req, res, next) => {
     try {
       const { applicationId } = req.params;
-      const { userId } = req.auth;
-      const data = req.body;
-
-      Object.keys(data).forEach(
-        (key) => data[key] === undefined && delete data[key],
-      );
+      const { status, adminFeedback } = req.body;
       const updated = await applicationService.updateApplication({
         applicationId: Number(applicationId),
-        userId: Number(userId),
-        data,
+        status,
+        adminFeedback,
       });
       res.status(200).json({
         success: true,
@@ -104,9 +103,12 @@ router.patch(
   },
 );
 
+// DELETE /challenge-application/applicationId == 유저가 PENDING시점일시 신청 취소
+// 유저 권한
 router.delete(
   '/:applicationId',
   auth.verifyAccessToken,
+  auth.forbidAdmin,
   async (req, res, next) => {
     try {
       const { applicationId } = req.params;

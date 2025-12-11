@@ -1,6 +1,4 @@
-import { prisma } from '../db/prisma.js';
 import { applicationsRepo } from '../repository/applications.repo.js';
-import { challengesRepo } from '../repository/challenges.repo.js';
 import { NotFoundException } from '../err/notFoundException.js';
 import { ForbiddenException } from '../err/forbiddenException.js';
 
@@ -29,14 +27,11 @@ async function getApplicationById({ applicationId }) {
   return applicationData;
 }
 
-async function updateApplication({ applicationId, userId, data }, tx) {
-  const db = tx || prisma;
+async function updateApplication({ applicationId, status, adminFeedback }) {
+  const data = { status, adminFeedback };
 
-  const prev = await getApplicationById({ applicationId });
-  if (prev.creator.id !== userId) {
-    throw new ForbiddenException('신청서를 수정할 권한이 없습니다.');
-  }
-  return applicationsRepo.updateApplication({ applicationId, data }, db);
+  console.log('service params:', { applicationId, status, adminFeedback });
+  return applicationsRepo.updateApplication({ applicationId, data });
 }
 
 async function deleteApplication({ applicationId, userId }) {
@@ -131,47 +126,6 @@ export async function getApplicationsListForAdmin({ query }) {
   };
 }
 
-async function approveApplication(applicationId) {
-  return prisma.$transaction(async (tx) => {
-    const application = await applicationsRepo.findApplicationById(
-      applicationId,
-      tx,
-    );
-    if (!application) throw new Error('Application not found');
-
-    if (application.status !== 'PENDING') {
-      throw new Error('Application is not in PENDING status');
-    }
-
-    const updated = await applicationsRepo.updateApplication(
-      applicationId,
-      {
-        status: 'APPROVED',
-        reviewedAt: new Date(),
-      },
-      tx,
-    );
-
-    const challenge = await challengesRepo.createChallengeFromApplication(
-      application,
-      tx,
-    );
-
-    return {
-      application: updated,
-      challenge,
-    };
-  });
-}
-
-async function rejectApplication(applicationId, adminFeedback) {
-  return applicationsRepo.updateApplication(applicationId, {
-    status: 'REJECTED',
-    adminFeedback,
-    reviewedAt: new Date(),
-  });
-}
-
 export default {
   createApplication,
   getApplicationsListForUser,
@@ -180,6 +134,4 @@ export default {
   getApplicationById,
   updateApplication,
   deleteApplication,
-  approveApplication,
-  rejectApplication,
 };

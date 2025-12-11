@@ -1,16 +1,10 @@
 import { prisma } from '../db/prisma.js';
-/**
- * @param {Object} data - { challengeId, workerId, content }
- * @param {Object} [tx] - 트랜잭션 클라이언트 (옵션)
- */
 
-async function createApplication(data, tx) {
-  const db = tx || prisma;
-  return db.challengeApplication.create({ data });
+async function createApplication(data) {
+  return prisma.challengeApplication.create({ data });
 }
-async function findApplicationsByUserId({ userId }, tx) {
-  const db = tx || prisma;
-  return db.ChallengeApplication.findUnique({
+async function findApplicationsByUserId({ userId }) {
+  return prisma.ChallengeApplication.findUnique({
     where: { id: Number(userId) },
     include: {
       creator: {
@@ -24,9 +18,8 @@ async function findApplicationsByUserId({ userId }, tx) {
     },
   });
 }
-async function findApplicationByApplicationId({ applicationId }, tx) {
-  const db = tx || prisma;
-  return db.ChallengeApplication.findUnique({
+async function findApplicationByApplicationId({ applicationId }) {
+  return prisma.ChallengeApplication.findUnique({
     where: { id: Number(applicationId) },
     include: {
       creator: {
@@ -41,11 +34,10 @@ async function findApplicationByApplicationId({ applicationId }, tx) {
   });
 }
 
-async function findApplicationsList({ where, skip, take, orderBy }, tx) {
-  const db = tx || prisma;
+async function findApplicationsList({ where, skip, take, orderBy }) {
   const [totalCount, list] = await Promise.all([
-    db.challengeApplication.count({ where }),
-    db.challengeApplication.findMany({
+    prisma.challengeApplication.count({ where }),
+    prisma.challengeApplication.findMany({
       where,
       skip,
       take,
@@ -66,18 +58,15 @@ async function findApplicationsList({ where, skip, take, orderBy }, tx) {
   return [totalCount, list];
 }
 
-async function updateApplication({ applicationId, data }, tx) {
-  const db = tx || prisma;
-  return db.challengeApplication.update({
+async function updateApplication({ applicationId, data }) {
+  return prisma.challengeApplication.update({
     where: { id: Number(applicationId) },
     data,
   });
 }
 
-async function deleteApplication({ applicationId }, tx) {
-  const db = tx || prisma;
-
-  return db.challengeApplication.delete({
+async function deleteApplication({ applicationId }) {
+  return prisma.challengeApplication.delete({
     where: { id: Number(applicationId) },
   });
 }
