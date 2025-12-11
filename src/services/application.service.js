@@ -1,40 +1,10 @@
-import { prisma } from '../db/prisma.js';
 import { applicationsRepo } from '../repository/applications.repo.js';
-import { challengesRepo } from '../repository/challenges.repo.js';
 import { NotFoundException } from '../err/notFoundException.js';
-// import { ConflictException } from '../err/conflictException.js';
 import { ForbiddenException } from '../err/forbiddenException.js';
 
 async function createApplication(data) {
   return applicationsRepo.createApplication(data);
 }
-
-// async function getApplicationsList({
-//   page = 1,
-//   limit = 10,
-//   status,
-//   category,
-//   orderby,
-// }) {
-//   const skip = (page - 1) * limit;
-
-//   const [totalCount, list] = await applicationsRepo.findApplicationsList({
-//     whereOptions: {
-//       ...(status && { status }),
-//       ...(category && { category }),
-//     },
-//     orderByOptions: orderby ? [{ [orderby]: 'desc' }] : [],
-//     skip,
-//     take: limit,
-//   });
-
-//   return {
-//     totalCount,
-//     list,
-//     page,
-//     limit,
-// //   };
-// }
 
 async function getMyApplications({ userId }) {
   const userData = await applicationsRepo.findApplicationsByUserId({ userId });
@@ -57,17 +27,11 @@ async function getApplicationById({ applicationId }) {
   return applicationData;
 }
 
-async function updateApplication({ applicationId, userId, data }, tx) {
-  const db = tx || prisma;
+async function updateApplication({ applicationId, status, adminFeedback }) {
+  const data = { status, adminFeedback };
 
-  // 1) 존재 여부 확인
-  const prev = await getApplicationById({ applicationId });
-  // 2) 권한 체크
-  if (prev.creator.id !== userId) {
-    throw new ForbiddenException('신청서를 수정할 권한이 없습니다.');
-  }
-  // 3) 업데이트
-  return applicationsRepo.updateApplication({ applicationId, data }, db);
+  console.log('service params:', { applicationId, status, adminFeedback });
+  return applicationsRepo.updateApplication({ applicationId, data });
 }
 
 async function deleteApplication({ applicationId, userId }) {
@@ -78,54 +42,96 @@ async function deleteApplication({ applicationId, userId }) {
   return applicationsRepo.deleteApplication({ applicationId });
 }
 
-async function approveApplication(applicationId) {
-  return prisma.$transaction(async (tx) => {
-    const application = await applicationsRepo.findApplicationById(
-      applicationId,
-      tx,
-    );
-    if (!application) throw new Error('Application not found');
+async function getApplicationsListForUser({ userId, query }) {
+  const {
+    page = 1,
+    pageSize = 10,
+    status,
+    category,
+    type,
+    orderby,
+    keyword,
+  } = query;
 
-    if (application.status !== 'PENDING') {
-      throw new Error('Application is not in PENDING status');
-    }
+  const skip = (page - 1) * pageSize;
+  const orderBy = orderby ? { [orderby]: 'desc' } : { createdAt: 'desc' };
 
-    const updated = await applicationsRepo.updateApplication(
-      applicationId,
-      {
-        status: 'APPROVED',
-        reviewedAt: new Date(),
-      },
-      tx,
-    );
+  const where = {
+    creatorId: userId, // 본인 데이터만
+    ...(status && { status }),
+    ...(category && { category }),
+    ...(type && { documentType: type }),
+    ...(keyword && {
+      OR: [
+        { title: { contains: keyword, mode: 'insensitive' } },
+        { description: { contains: keyword, mode: 'insensitive' } },
+        { category: { contains: keyword, mode: 'insensitive' } },
+      ],
+    }),
+  };
 
-    const challenge = await challengesRepo.createChallengeFromApplication(
-      application,
-      tx,
-    );
-
-    return {
-      application: updated,
-      challenge,
-    };
+  const [totalCount, list] = await applicationsRepo.findApplicationsList({
+    where,
+    skip,
+    take: pageSize,
+    orderBy,
   });
+
+  return {
+    totalCount,
+    page,
+    pageSize,
+    list,
+  };
 }
+export async function getApplicationsListForAdmin({ query }) {
+  const {
+    page = 1,
+    pageSize = 10,
+    status,
+    category,
+    type,
+    orderby,
+    keyword,
+  } = query;
 
-async function rejectApplication(applicationId, adminFeedback) {
-  return applicationsRepo.updateApplication(applicationId, {
-    status: 'REJECTED',
-    adminFeedback,
-    reviewedAt: new Date(),
+  const skip = (page - 1) * pageSize;
+  const orderBy = orderby ? { [orderby]: 'desc' } : { createdAt: 'desc' };
+
+  const where = {
+    ...(status && { status }),
+    ...(category && { category }),
+    ...(type && { documentType: type }),
+    ...(keyword && {
+      OR: [
+        { title: { contains: keyword, mode: 'insensitive' } },
+        { description: { contains: keyword, mode: 'insensitive' } },
+        { category: { contains: keyword, mode: 'insensitive' } },
+      ],
+    }),
+  };
+
+  const [totalCount, list] = await applicationsRepo.findApplicationsList({
+    where,
+    skip,
+    take: pageSize,
+    orderBy,
   });
+
+  return {
+    totalCount,
+    page,
+    pageSize,
+    list,
+  };
 }
 
 export default {
   createApplication,
-  // getApplicationsList,
+  getApplicationsListForUser,
+  getApplicationsListForAdmin,
   getMyApplications,
   getApplicationById,
   updateApplication,
   deleteApplication,
-  approveApplication,
-  rejectApplication,
 };
