@@ -1,5 +1,6 @@
 import { expressjwt } from 'express-jwt';
 import { config } from '../config/config.js';
+import { ForbiddenException } from '../err/forbiddenException.js';
 
 const verifyAccessToken = expressjwt({
   secret: config.JWT_SECRET,
@@ -21,8 +22,31 @@ function validateEmailAndPassword(req, res, next) {
   }
   next();
 }
+
+function requireAdmin(req, res, next) {
+  const { role } = req.auth;
+
+  if (role !== 'ADMIN') {
+    throw new ForbiddenException('관리자 권한이 필요합니다.');
+  }
+
+  next();
+}
+
+function forbidAdmin(req, res, next) {
+  const { role } = req.auth;
+
+  if (role === 'ADMIN') {
+    throw new ForbiddenException('관리자는 해당 동작을 수행할 수 없습니다.');
+  }
+
+  next();
+}
+
 export default {
   verifyAccessToken,
   verifyRefreshToken,
   validateEmailAndPassword,
+  requireAdmin,
+  forbidAdmin,
 };

@@ -9,11 +9,12 @@ const router = express.Router({ mergeParams: true });
 router.post(
   '/',
   auth.verifyAccessToken,
+  auth.forbidAdmin,
   validate(worksValidation, 'body'),
   async (req, res, next) => {
     try {
-      const { challengeId } = req.params;
       const { userId: workerId } = req.auth;
+      const { challengeId } = req.params;
       const { content } = req.body;
       const newWorkData = await worksServices.createWork({
         challengeId: Number(challengeId),
