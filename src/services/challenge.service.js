@@ -51,8 +51,6 @@ async function getMyChallenges(userId) {
 
 async function getChallengeById({ challengeId, userId }) {
   const challenge = await challengesRepo.findChallengeById({ challengeId });
-  console.log(challenge);
-  console.log(userId);
   if (!challenge) throw new Error('챌린지를 찾을 수 없습니다.');
   isAuthorized(challenge.creatorId, userId);
   return challenge;
