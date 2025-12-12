@@ -2,7 +2,7 @@ POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
 {
-    "email": "test4483@test.com",
+    "email": "test1@test.com",
     "nickname": "test",
     "password": "test"
 }
@@ -13,10 +13,11 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-    "email": "test4483@test.com",
+    "email": "test1@test.com",
     "password": "test"
 }
 
+
 ###
 POST http://localhost:3000/auth/token/refresh
-Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjgsImlhdCI6MTc2NTI0NDgzNSwiZXhwIjoxNzY2NDU0NDM1fQ.0Y_c76sF7RP6DE77d1TkOfF5tZQUflylG2946uUsc9g
+Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjUyNjQ3MzQsImV4cCI6MTc2NjQ3NDMzNH0.mMSkuZMvtd1t0nB3M86Lq3QkJP9z8bxZ71F4euNingI
