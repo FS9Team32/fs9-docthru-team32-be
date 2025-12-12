@@ -17,7 +17,32 @@ Content-Type: application/json
     "password": "test"
 }
 
+###어드민
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@test.com",
+    "password": "test"
+}
+
 
 ###
 POST http://localhost:3000/auth/token/refresh
 Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjUyNjQ3MzQsImV4cCI6MTc2NjQ3NDMzNH0.mMSkuZMvtd1t0nB3M86Lq3QkJP9z8bxZ71F4euNingI
+
+### 2) 내 챌린지 신청서 조회
+GET http://localhost:3000/users/me/challenge-applications?page=1&pageSize=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjU1MjUzMjYsImV4cCI6MTc2NTUyODkyNn0.SgNcaZmUymzTMCe6Wo-qtBtjuIuVrqksjNXIT9XfnQE
+
+### 3) 필터 적용된 내 챌린지 신청서 조회
+GET http://localhost:3000/users/me/challenge-applications?page=1&pageSize=10&status=APPROVED
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjU1MjUzMjYsImV4cCI6MTc2NTUyODkyNn0.SgNcaZmUymzTMCe6Wo-qtBtjuIuVrqksjNXIT9XfnQE
+
+### 4) 내가 만든 챌린지 조회
+GET http://localhost:3000/users/me/challenge?page=1&pageSize=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjU1MjUzMjYsImV4cCI6MTc2NTUyODkyNn0.SgNcaZmUymzTMCe6Wo-qtBtjuIuVrqksjNXIT9XfnQE
+
+### 5) 필터 적용된 내 챌린지 조회
+GET http://localhost:3000/users/me/challenge?page=1&pageSize=10&status=RECRUITING&category=Next.js
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjU1MjUzMjYsImV4cCI6MTc2NTUyODkyNn0.SgNcaZmUymzTMCe6Wo-qtBtjuIuVrqksjNXIT9XfnQE
