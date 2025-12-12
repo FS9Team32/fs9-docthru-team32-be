@@ -42,15 +42,15 @@ async function findApplicationsList({ where, skip, take, orderBy }) {
   return [totalCount, list];
 }
 
-async function updateApplication({ applicationId, data }) {
-  return prisma.challengeApplication.update({
+async function updateApplication({ applicationId, data }, tx) {
+  return tx.challengeApplication.update({
     where: { id: Number(applicationId) },
     data,
   });
 }
 
-async function deleteApplication({ applicationId }) {
-  return prisma.challengeApplication.delete({
+async function deleteApplication({ applicationId }, tx) {
+  return tx.challengeApplication.delete({
     where: { id: Number(applicationId) },
   });
 }
