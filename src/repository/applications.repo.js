@@ -3,24 +3,9 @@ import { prisma } from '../db/prisma.js';
 async function createApplication(data) {
   return prisma.challengeApplication.create({ data });
 }
-// async function findApplicationsByUserId({ userId }) {
-//   return prisma.ChallengeApplication.findUnique({
-//     where: { id: Number(userId) },
-//     include: {
-//       creator: {
-//         select: {
-//           id: true,
-//           nickname: true,
-//           role: true,
-//         },
-//       },
-//       challenges: true,
-//     },
-//   });
-// }
-async function findApplicationById({ applicationId }, tx) {
-  const db = tx || prisma;
-  return db.challengeApplication.findUnique({
+
+async function findApplicationById({ applicationId }) {
+  return prisma.challengeApplication.findUnique({
     where: { id: Number(applicationId) },
     include: {
       creator: {
@@ -50,7 +35,6 @@ async function findApplicationsList({ where, skip, take, orderBy }) {
             role: true,
           },
         },
-        challenges: true,
       },
     }),
   ]);
