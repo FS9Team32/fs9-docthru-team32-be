@@ -7,6 +7,8 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { disconnectDB } from './db/prisma.js';
 import { cors } from './middlewares/cors.js';
 import cookieParser from 'cookie-parser';
+import swaggerUi from 'swagger-ui-express';
+import specs from './config/swagger.config.js';
 
 const app = express();
 
@@ -18,6 +20,9 @@ app.use(cors);
 if (isDevelopment) {
   app.use(logger);
   app.use(requestTimer);
+
+  // Swagger UI 설정
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 }
 
 app.use('/', router);
