@@ -29,14 +29,12 @@ async function getApplicationById({ applicationId }) {
 
 async function updateApplication({ applicationId, status, adminFeedback }) {
   const data = { status, adminFeedback };
-
-  console.log('service params:', { applicationId, status, adminFeedback });
   return applicationsRepo.updateApplication({ applicationId, data });
 }
 
 async function deleteApplication({ applicationId, userId }) {
   const prev = await getApplicationById({ applicationId });
-  if (prev.creator.id !== userId) {
+  if (prev.creatorId !== userId) {
     throw new ForbiddenException('신청서를 삭제할 권한이 없습니다.');
   }
   return applicationsRepo.deleteApplication({ applicationId });
