@@ -94,8 +94,11 @@ model Work {
   workerId    Int      @map("worker_id")
   isSelected  Boolean  @default(false) @map("is_selected")
   content     String   @db.Text
+  likeCount   Int      @default(0) @map("like_count")
+
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
+  editedAt    DateTime @default(now()) @map("edited_at")
 
   challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
   worker    User      @relation(fields: [workerId], references: [id])

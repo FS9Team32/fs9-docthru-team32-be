@@ -17,6 +17,7 @@ Content-Type: application/json
     "password": "test"
 }
 
+
 ###
 POST http://localhost:3000/auth/token/refresh
-Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2NTE1NTExNywiZXhwIjoxNzY2MzY0NzE3fQ.HikuO1HrTTWjRitTHzCd5mjC2LhK-4Xe_lYTSVmVaqE
+Cookie: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJOT1JNQUwiLCJpYXQiOjE3NjUyNjQ3MzQsImV4cCI6MTc2NjQ3NDMzNH0.mMSkuZMvtd1t0nB3M86Lq3QkJP9z8bxZ71F4euNingI

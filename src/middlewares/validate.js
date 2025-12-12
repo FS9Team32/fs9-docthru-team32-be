@@ -11,11 +11,12 @@ export const validate =
   async (req, res, next) => {
     try {
       const dataToValidate = req[type] || {};
-      await schema.parseAsync(dataToValidate);
+      const parsed = await schema.parseAsync(dataToValidate);
+      req[type] = parsed;
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const formattedErrors = error.errors.map((err) => ({
+        const formattedErrors = error.issues.map((err) => ({
           path: err.path.join('.'),
           message: err.message,
           location: type,
