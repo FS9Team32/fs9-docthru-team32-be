@@ -29,9 +29,9 @@ router.patch(
   validate(worksValidation, 'body'),
   async (req, res, next) => {
     try {
-      const { workId, role } = req.params;
+      const { workId } = req.params;
       const { content } = req.body;
-      const { userId } = req.auth; // 현재 로그인한 유저 ID
+      const { userId, role } = req.auth; // 현재 로그인한 유저 ID
 
       const updatedWork = await worksServices.updateWork({
         workId: Number(workId),
@@ -53,8 +53,8 @@ router.patch(
 // 삭제
 router.delete('/:workId', auth.verifyAccessToken, async (req, res, next) => {
   try {
-    const { workId, role } = req.params;
-    const { userId } = req.auth;
+    const { workId } = req.params;
+    const { userId, role } = req.auth;
     const deletedWork = await worksServices.deleteWork({
       workId: Number(workId),
       userId: Number(userId),
