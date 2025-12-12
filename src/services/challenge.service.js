@@ -2,6 +2,8 @@ import { prisma } from '../db/prisma.js';
 import { challengesRepo } from '../repository/challenges.repo.js';
 import { applicationsRepo } from '../repository/applications.repo.js';
 import { isAuthorized } from '../utils/permission.js';
+import { NotFoundException } from '../err/notFoundException.js';
+import { ConflictException } from '../err/conflictException.js';
 
 export async function getChallengesList({ query }) {
   const {
@@ -51,8 +53,11 @@ async function getMyChallenges(userId) {
 
 async function getChallengeById({ challengeId, userId }) {
   const challenge = await challengesRepo.findChallengeById({ challengeId });
-  if (!challenge) throw new Error('챌린지를 찾을 수 없습니다.');
-  isAuthorized(challenge.creatorId, userId);
+
+  if (!challenge) {
+    throw new NotFoundException('챌린지를 찾을 수 없습니다.');
+  }
+  isAuthorized(challenge.creatorId, userId, challenge.creator.role);
   return challenge;
 }
 
@@ -65,7 +70,7 @@ async function createChallenge({ applicationId }) {
       tx,
     );
 
-    if (!application) throw new Error('신청서를 찾을 수 없습니다.');
+    if (!application) throw new NotFoundException('신청서를 찾을 수 없습니다.');
 
     const updatedApplication = await applicationsRepo.updateApplication(
       {
@@ -81,7 +86,7 @@ async function createChallenge({ applicationId }) {
     );
 
     if (existing) {
-      throw new Error('이미 생성된 챌린지입니다.');
+      throw new ConflictException('이미 생성된 챌린지입니다.');
     }
 
     const challengeData = {
@@ -116,16 +121,16 @@ async function deleteChallenge({ challengeId, adminFeedback }) {
       { challengeId },
       tx,
     );
-    if (!challenge) throw new Error('챌린지를 찾을 수 없습니다.');
+    if (!challenge) throw new NotFoundException('챌린지를 찾을 수 없습니다.');
 
     const application = await applicationsRepo.findApplicationById(
       { applicationId: challenge.applicationId },
       tx,
     );
 
-    if (!application) throw new Error('신청서를 찾을 수 없습니다.');
+    if (!application) throw new NotFoundException('신청서를 찾을 수 없습니다.');
     if (application.status !== 'APPROVED') {
-      throw new Error('승인 완료된 신청서만 받을 수 있습니다.');
+      throw new ConflictException('승인 완료된 신청서만 받을 수 있습니다.');
     }
 
     const deletedChallenge = await challengesRepo.deleteChallenge({
