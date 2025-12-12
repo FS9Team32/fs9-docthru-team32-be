@@ -6,19 +6,10 @@ async function createApplication(data) {
   return applicationsRepo.createApplication(data);
 }
 
-async function getMyApplications({ userId }) {
-  const userData = await applicationsRepo.findApplicationsByUserId({ userId });
-  if (!userData) {
-    throw new NotFoundException(
-      '유저의 신청서가 존재하지 않습니다. 다시 확인해 주세요.',
-    );
-  }
-}
-
 async function getApplicationById({ applicationId }) {
-  const applicationData = await applicationsRepo.findApplicationByApplicationId(
-    { applicationId },
-  );
+  const applicationData = await applicationsRepo.findApplicationById({
+    applicationId,
+  });
   if (!applicationData) {
     throw new NotFoundException(
       '신청서가 존재하지 않습니다. 다시 확인해 주세요.',
@@ -130,7 +121,6 @@ export default {
   createApplication,
   getApplicationsListForUser,
   getApplicationsListForAdmin,
-  getMyApplications,
   getApplicationById,
   updateApplication,
   deleteApplication,

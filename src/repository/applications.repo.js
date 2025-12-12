@@ -3,23 +3,9 @@ import { prisma } from '../db/prisma.js';
 async function createApplication(data) {
   return prisma.challengeApplication.create({ data });
 }
-async function findApplicationsByUserId({ userId }) {
-  return prisma.ChallengeApplication.findUnique({
-    where: { id: Number(userId) },
-    include: {
-      creator: {
-        select: {
-          id: true,
-          nickname: true,
-          role: true,
-        },
-      },
-      challenges: true, // 승인된 챌린지가 연결되어 있으면 포함
-    },
-  });
-}
-async function findApplicationByApplicationId({ applicationId }) {
-  return prisma.ChallengeApplication.findUnique({
+
+async function findApplicationById({ applicationId }) {
+  return prisma.challengeApplication.findUnique({
     where: { id: Number(applicationId) },
     include: {
       creator: {
@@ -29,7 +15,6 @@ async function findApplicationByApplicationId({ applicationId }) {
           role: true,
         },
       },
-      challenges: true, // 승인된 챌린지가 연결되어 있으면 포함
     },
   });
 }
@@ -50,7 +35,6 @@ async function findApplicationsList({ where, skip, take, orderBy }) {
             role: true,
           },
         },
-        challenges: true,
       },
     }),
   ]);
@@ -74,8 +58,7 @@ async function deleteApplication({ applicationId }) {
 export const applicationsRepo = {
   createApplication,
   findApplicationsList,
-  findApplicationsByUserId,
-  findApplicationByApplicationId,
+  findApplicationById,
   updateApplication,
   deleteApplication,
 };
