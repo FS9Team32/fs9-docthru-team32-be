@@ -5,7 +5,7 @@ import applicationService from '../services/application.service.js';
 import { validate } from '../middlewares/validate.js';
 import { challengesQueryValidation } from '../validations/challenges.validation.js';
 import challengeService from '../services/challenge.service.js';
-
+import authService from '../services/auth.service.js';
 const router = express.Router();
 router.get(
   '/me/challenge-applications',
@@ -53,4 +53,19 @@ router.get(
     }
   },
 );
+
+router.get('/me', auth.verifyAccessToken, async (req, res, next) => {
+  try {
+    const { userId } = req.auth;
+    const user = await authService.getUserById(Number(userId));
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;
