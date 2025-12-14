@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
 import { ConflictException } from '../err/conflictException.js';
 import { UnauthorizedException } from '../err/unauthorizedException.js';
-
+import { NotFoundException } from '../err/notFoundException.js';
 async function createUser(user) {
   try {
     const existedUser = await authRepo.findByEmail(user.email);
@@ -58,7 +58,7 @@ async function verifyPassword(inputPassword, password) {
 }
 
 function createToken(user, type) {
-  const payload = { userId: user.id };
+  const payload = { userId: user.id, role: user.role };
   const token = jwt.sign(payload, config.JWT_SECRET, {
     expiresIn: type === 'refresh' ? '2w' : '1h',
   });
@@ -82,10 +82,19 @@ async function refreshToken(userId, refreshToken) {
   return { newAccessToken, newRefreshToken };
 }
 
+async function getUserById(userId) {
+  const user = await authRepo.findById(userId);
+  if (!user) {
+    throw new NotFoundException('User Not Found');
+  }
+  return filterSensitiveUserData(user);
+}
+
 export default {
   createUser,
   getUser,
   updateUser,
   createToken,
   refreshToken,
+  getUserById,
 };
