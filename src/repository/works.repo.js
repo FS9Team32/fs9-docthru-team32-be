@@ -131,6 +131,18 @@ async function findWorkById(workId, tx) {
           role: true,
         },
       },
+      challenge: true,
+
+      comments: {
+        include: {
+          author: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      },
+
+      _count: {
+        select: { likes: true },
+      },
     },
   });
 }
