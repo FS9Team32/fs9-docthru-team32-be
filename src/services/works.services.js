@@ -107,7 +107,7 @@ async function getWork(id) {
 async function updateWork({ workId, userId, role, content }) {
   const prevWork = await getWork(workId);
 
-  isAuthorized(prevWork.workId, userId, role);
+  isAuthorized(prevWork.workerId, userId, role);
 
   const data = {
     content,
@@ -124,7 +124,7 @@ async function updateWork({ workId, userId, role, content }) {
 async function deleteWork({ workId, userId, role }) {
   const prevWork = await getWork(workId);
 
-  isAuthorized(prevWork.workId, userId, role);
+  isAuthorized(prevWork.workerId, userId, role);
 
   const deletedWork = await worksRepo.deleteWork(workId);
   return deletedWork;
