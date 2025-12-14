@@ -137,7 +137,7 @@ async function main() {
     data: {
       creatorId: proUser1.id,
       title: 'Next.js App Router 딥다이브',
-      category: 'Next.js',
+      category: 'Next',
       documentType: 'Blog',
       originalLink:
         'https://nextjs.org/docs/app/building-your-application/routing',
