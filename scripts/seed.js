@@ -8,6 +8,7 @@ async function main() {
   console.log('🌱 시딩 작업을 시작합니다...');
 
   // 1. 기존 데이터 초기화
+  await prisma.notification.deleteMany();
   await prisma.like.deleteMany();
   await prisma.comment.deleteMany();
   await prisma.work.deleteMany();
@@ -284,6 +285,31 @@ async function main() {
   });
 
   console.log('✅ 좋아요 4개 생성 완료');
+
+  // 9. 알림 생성 (Notification)
+  await prisma.notification.createMany({
+    data: [
+      {
+        userId: proUser1.id,
+        message:
+          '신청하신 "Next.js App Router 딥다이브" 챌린지가 승인되었습니다.',
+      },
+      {
+        userId: proUser1.id,
+        message: '새로운 작업물이 제출되었습니다.',
+      },
+      {
+        userId: normalUser1.id,
+        message: '제출하신 작업물에 좋아요가 달렸습니다.',
+      },
+      {
+        userId: normalUser3.id,
+        message: '신청하신 "개인 일기장 번역하기" 챌린지가 반려되었습니다.',
+      },
+    ],
+  });
+
+  console.log('✅ 알림 4개 생성 완료');
   console.log('🎉 모든 시딩 데이터가 성공적으로 들어갔습니다!');
 }
 
