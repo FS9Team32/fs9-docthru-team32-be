@@ -7,11 +7,18 @@ async function findNotificationsListByUserId(userId, tx) {
   });
 }
 
+async function findNotificationById(id, tx) {
+  const db = tx || prisma;
+  return db.notification.delete({
+    where: { id: Number(id) },
+  });
+}
+
 async function addNotification({ userId, message }, tx) {
   const db = tx || prisma;
   return db.notification.create({
     data: {
-      userId,
+      userId: Number(userId),
       message,
     },
   });
@@ -26,13 +33,14 @@ async function deleteAllNotificationsByUserId(userId, tx) {
 
 async function deleteNotificationById(id, tx) {
   const db = tx || prisma;
-  return db.notification.deleteMany({
+  return db.notification.delete({
     where: { id: Number(id) },
   });
 }
 
 export const notificationsRepo = {
   findNotificationsListByUserId,
+  findNotificationById,
   addNotification,
   deleteAllNotificationsByUserId,
   deleteNotificationById,
