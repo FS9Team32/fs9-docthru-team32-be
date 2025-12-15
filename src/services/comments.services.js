@@ -35,14 +35,14 @@ async function commentExistence(commentId) {
 
 async function updateComment({ commentId, userId, role, content }) {
   const comment = await commentExistence(commentId);
-  isAuthorized(comment.workId, userId, role);
+  isAuthorized(comment.authorId, userId, role);
   const data = { content };
   return commentsRepo.updateComment({ commentId, data });
 }
 
 async function deleteComment({ commentId, userId, role }) {
   const comment = await commentExistence(commentId);
-  isAuthorized(comment.workId, userId, role);
+  isAuthorized(comment.authorId, userId, role);
   return commentsRepo.deleteComment(commentId);
 }
 
