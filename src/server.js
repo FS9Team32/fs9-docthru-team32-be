@@ -14,19 +14,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-if (isDevelopment) {
-  app.use(cors());
+const whiteList = config.FRONT_URL
+  ? config.FRONT_URL.split(',').map((url) => url.trim())
+  : [];
+
+app.use(
+  cors({
+    origin: isProduction() ? whiteList : true, // 프로덕션은 화이트리스트, 개발은 모두 허용(true)
+    credentials: true,
+    optionsSuccessStatus: 200,
+  }),
+);
+
+if (isDevelopment()) {
   app.use(logger);
   app.use(requestTimer);
-}
-
-if (isProduction) {
-  const corsOptions = {
-    origin: config.FRONT_URL,
-    optionsSuccessStatus: 200,
-    credentials: true,
-  };
-  app.use(cors(corsOptions));
 }
 
 app.use('/', router);
