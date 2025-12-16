@@ -36,11 +36,11 @@ async function closeExpiredChallenges() {
 
 export function startChallengeScheduler() {
   // 매 5분
-  cron.schedule('/5* * * * *', async () => {
+  cron.schedule('*/5 * * * *', async () => {
     try {
       await closeExpiredChallenges();
     } catch (e) {
-      console.error('[Challenge Scheduler Error]', e);
+      console.error('챌린지 스케줄러 오류', e);
     }
   });
 }
