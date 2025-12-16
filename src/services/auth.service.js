@@ -59,10 +59,10 @@ async function verifyPassword(inputPassword, password) {
 
 function createToken(user, type) {
   const payload = { userId: user.id };
-  const token = jwt.sign(payload, config.JWT_SECRET, {
-    expiresIn: type === 'refresh' ? '2w' : '1h',
-  });
-  return token;
+  const secret =
+    type === 'refresh' ? config.JWT_REFRESH_SECRET : config.JWT_SECRET;
+  const expiresIn = type === 'refresh' ? '2w' : '1h';
+  return jwt.sign(payload, secret, { expiresIn });
 }
 
 async function updateUser(id, data) {
@@ -72,8 +72,11 @@ async function updateUser(id, data) {
 
 async function refreshToken(userId, refreshToken) {
   const user = await authRepo.findById(userId);
-  if (!user || user.refreshToken !== refreshToken) {
+  if (!user || !user.refreshToken) {
     throw new UnauthorizedException('Unauthorized Error');
+  }
+  if (user.refreshToken !== refreshToken) {
+    throw new UnauthorizedException('Invalid Refresh Token');
   }
 
   const newAccessToken = createToken(user);
