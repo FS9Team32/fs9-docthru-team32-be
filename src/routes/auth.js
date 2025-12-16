@@ -61,8 +61,6 @@ authRouter.post('/logout', auth.verifyAccessToken, async (req, res, next) => {
   }
 });
 
-export default authRouter;
-
 authRouter.post(
   '/token/refresh',
   auth.verifyRefreshToken,
@@ -86,3 +84,5 @@ authRouter.post(
     }
   },
 );
+
+export default authRouter;

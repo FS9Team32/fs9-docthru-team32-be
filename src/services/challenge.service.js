@@ -92,13 +92,12 @@ export async function getChallengesListForUser({ query, userId, role }) {
   };
 }
 
-async function getChallengeById({ challengeId, userId }) {
+async function getChallengeById({ challengeId }) {
   const challenge = await challengesRepo.findChallengeById({ challengeId });
 
   if (!challenge) {
     throw new NotFoundException('챌린지를 찾을 수 없습니다.');
   }
-  isAuthorized(challenge.creatorId, userId, challenge.creator.role);
   return challenge;
 }
 
