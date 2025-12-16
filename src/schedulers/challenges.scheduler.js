@@ -15,10 +15,7 @@ async function closeExpiredChallenges() {
     await prisma.$transaction(async (tx) => {
       const winner = await tx.work.findFirst({
         where: { challengeId: challenge.id },
-        orderBy: [
-          { likeCount: 'desc' },
-          { createdAt: 'asc' }, // 동점 방지
-        ],
+        orderBy: [{ likeCount: 'desc' }],
       });
       if (winner) {
         await tx.work.update({
@@ -35,8 +32,8 @@ async function closeExpiredChallenges() {
 }
 
 export function startChallengeScheduler() {
-  // 매 5분
-  cron.schedule('*/5 * * * *', async () => {
+  // 매 12시간마다 (0시와 12시)
+  cron.schedule('0 0,12 * * *', async () => {
     try {
       await closeExpiredChallenges();
     } catch (e) {
