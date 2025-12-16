@@ -5,23 +5,23 @@ export const applicationsValidation = z.object({
     .string({
       required_error: 'title is required',
     })
-    .min(1, 'title cannot be empty'),
+    .min(1, '제목을 입력해주세요.'),
 
   category: z
     .string({
       required_error: 'category is required',
     })
-    .min(1, 'category cannot be empty'),
+    .min(1, '카테고리를 선택해주세요.'),
 
   documentType: z
     .string({
       required_error: 'documentType is required',
     })
-    .min(1, 'documentType cannot be empty'),
+    .min(1, '문서유형을 선택해주세요.'),
 
   originalLink: z
     .string()
-    .url('originalLink must be a valid URL')
+    .url('원문URL은 유효한 주소여야합니다.')
     .optional()
     .or(z.literal('')),
 
@@ -32,7 +32,7 @@ export const applicationsValidation = z.object({
     .optional()
     .transform((v) => (v ? Number(v) : 1))
     .refine((num) => !isNaN(num) && num >= 1, {
-      message: 'maxParticipants must be a positive number',
+      message: '최대 참여자수는 1 이상의 자연수여야합니다.',
     }),
 
   deadlineAt: z
