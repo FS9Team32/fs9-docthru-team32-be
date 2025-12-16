@@ -7,6 +7,47 @@ import { applicationsQueryValidation } from '../validations/applications.validat
 import { challengesQueryValidation } from '../validations/challenges.validation.js';
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: 사용자 관련 API
+ */
+
+/**
+ * @swagger
+ * /user/me/challenge-applications:
+ *   get:
+ *     summary: 내 챌린지 신청 목록 조회
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [PENDING, ACCEPTED, REJECTED]
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *     responses:
+ *       200:
+ *         description: 조회 성공
+ */
 router.get(
   '/me/challenge-applications',
   auth.verifyAccessToken,
@@ -31,6 +72,37 @@ router.get(
   },
 );
 
+/**
+ * @swagger
+ * /user/me/challenge:
+ *   get:
+ *     summary: 내 챌린지 목록 조회
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - in: query
+ *         name: field
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: progress
+ *         schema:
+ *           type: boolean
+ *     responses:
+ *       200:
+ *         description: 조회 성공
+ */
 router.get(
   '/me/challenge',
   auth.verifyAccessToken,
