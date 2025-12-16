@@ -1,5 +1,5 @@
-import { likesRepo } from '../repository/likes.repo.js';
-import { worksRepo } from '../repository/works.repo.js';
+import { likesRepo } from '../repos/likes.repo.js';
+import { worksRepo } from '../repos/works.repo.js';
 import { NotFoundException } from '../err/notFoundException.js';
 import { ConflictException } from '../err/conflictException.js';
 

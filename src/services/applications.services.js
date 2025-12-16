@@ -1,4 +1,4 @@
-import { applicationsRepo } from '../repository/applications.repo.js';
+import { applicationsRepo } from '../repos/applications.repo.js';
 import { NotFoundException } from '../err/notFoundException.js';
 import { ForbiddenException } from '../err/forbiddenException.js';
 

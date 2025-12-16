@@ -1,12 +1,5 @@
 import { prisma } from '../db/prisma.js';
 
-async function findChallengeById({ challengeId }, tx) {
-  const db = tx || prisma;
-  return db.challenge.findUnique({
-    where: { id: Number(challengeId) },
-  });
-}
-
 async function findChallengeList({ where, skip, take, orderBy }) {
   const [totalCount, originList] = await prisma.$transaction([
     prisma.challenge.count({ where }),
@@ -58,9 +51,9 @@ async function updateChallengeStatus(challengeId, status, tx) {
   });
 }
 
-async function findApplicationById(applicationId, tx = prisma) {
-  const originData = await tx.challenge.findUnique({
-    where: { applicationId },
+async function findChallengeById({ challengeId }) {
+  const originData = await prisma.challenge.findUnique({
+    where: { id: Number(challengeId) },
     include: {
       creator: {
         select: {
@@ -70,15 +63,13 @@ async function findApplicationById(applicationId, tx = prisma) {
         },
       },
       _count: {
-        select: { works: true }, // 🔥 작업물 개수 조회
+        select: { works: true },
       },
     },
   });
 
   if (!originData) return null;
-
   const { _count, ...rest } = originData;
-
   return {
     ...rest,
     workCount: _count.works,
@@ -94,7 +85,6 @@ export const challengesRepo = {
   createChallenge,
   updateChallenge,
   findChallengeList,
-  findApplicationById,
   findChallengeById,
   updateChallengeStatus,
   deleteChallenge,

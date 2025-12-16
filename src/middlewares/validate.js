@@ -21,7 +21,9 @@ export const validate =
           message: err.message,
           location: type,
         }));
-        next(new BadRequestException('유효성 검사 실패', formattedErrors));
+        next(
+          new BadRequestException(formattedErrors[0].message, formattedErrors),
+        );
       } else {
         // 다른 오류는 다음 오류 핸들러로 전달한다.
         next(error);

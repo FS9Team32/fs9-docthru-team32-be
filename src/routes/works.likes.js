@@ -1,5 +1,5 @@
 import express from 'express';
-import likeServices from '../services/like.services.js';
+import likesServices from '../services/likes.services.js';
 import auth from '../middlewares/auth.js';
 
 const router = express.Router({ mergeParams: true });
@@ -56,7 +56,7 @@ router.post(
       const { workId } = req.params;
       const { userId } = req.auth;
 
-      await likeServices.createLike({
+      await likesServices.createLike({
         workId: Number(workId),
         userId: Number(userId),
       });
@@ -114,7 +114,7 @@ router.delete(
       const { workId } = req.params;
       const { userId } = req.auth;
 
-      await likeServices.deleteLike({
+      await likesServices.deleteLike({
         workId: Number(workId),
         userId: Number(userId),
       });
