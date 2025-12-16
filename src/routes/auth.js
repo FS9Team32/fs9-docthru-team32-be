@@ -1,61 +1,70 @@
 import express from 'express';
-import authService from '../services/auth.service.js';
+import authServices from '../services/auth.services.js';
 import auth from '../middlewares/auth.js';
 import { BadRequestException } from '../err/badRequestException.js';
+import { validate } from '../middlewares/validate.js';
+import {
+  signupValidation,
+  loginValidation,
+} from '../validations/auth.validation.js';
 const authRouter = express.Router();
 
-authRouter.post('/signup', async (req, res, next) => {
-  try {
-    const { email, nickname, password } = req.body;
-    if (!email || !nickname || !password) {
-      throw new BadRequestException('All Inputs Are Required');
+authRouter.post(
+  '/signup',
+  validate(signupValidation, 'body'),
+  async (req, res, next) => {
+    try {
+      const { email, nickname, password } = req.body;
+
+      const user = await authServices.createUser({ email, nickname, password });
+      const accessToken = authServices.createToken(user);
+      const refreshToken = authServices.createToken(user, 'refresh');
+
+      await authServices.updateUser(user.id, { refreshToken });
+      res.status(201).json({
+        success: true,
+        ...user,
+        accessToken,
+        refreshToken,
+      });
+    } catch (error) {
+      next(error);
     }
+  },
+);
 
-    const user = await authService.createUser({ email, nickname, password });
-    const accessToken = authService.createToken(user);
-    const refreshToken = authService.createToken(user, 'refresh');
+authRouter.post(
+  '/login',
+  validate(loginValidation, 'body'),
+  async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
 
-    await authService.updateUser(user.id, { refreshToken });
-    res.status(201).json({
-      ...user,
-      accessToken,
-      refreshToken,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+      const user = await authServices.getUser(email, password);
+      const accessToken = authServices.createToken(user);
+      const refreshToken = authServices.createToken(user, 'refresh');
 
-authRouter.post('/login', async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      throw new BadRequestException('Email and Password is Required');
+      await authServices.updateUser(user.id, { refreshToken });
+
+      res.json({
+        success: true,
+        ...user,
+        accessToken,
+        refreshToken,
+      });
+    } catch (error) {
+      next(error);
     }
-
-    const user = await authService.getUser(email, password);
-    const accessToken = authService.createToken(user);
-    const refreshToken = authService.createToken(user, 'refresh');
-
-    await authService.updateUser(user.id, { refreshToken });
-
-    res.json({
-      ...user,
-      accessToken,
-      refreshToken,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+  },
+);
 
 authRouter.post('/logout', auth.verifyAccessToken, async (req, res, next) => {
   try {
     const { userId } = req.auth;
 
-    await authService.updateUser(userId, { refreshToken: null });
+    await authServices.updateUser(userId, { refreshToken: null });
 
-    res.status(200).json({ message: 'Logout successful' });
+    res.status(200).json({ success: true, message: '로그아웃 성공' });
   } catch (error) {
     next(error);
   }
@@ -69,13 +78,14 @@ authRouter.post(
       const { userId } = req.auth;
       const { refreshToken } = req.body;
       if (!refreshToken) {
-        throw new BadRequestException('RefreshToken is required');
+        throw new BadRequestException('리프레시 토큰이 필요합니다.');
       }
 
       const { newAccessToken, newRefreshToken } =
-        await authService.refreshToken(userId, refreshToken);
+        await authServices.refreshToken(userId, refreshToken);
 
       return res.json({
+        success: true,
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
       });

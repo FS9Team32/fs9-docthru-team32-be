@@ -1,10 +1,10 @@
 import express from 'express';
 import auth from '../middlewares/auth.js';
-import { applicationsQueryValidation } from '../validations/applications.validation.js';
-import applicationService from '../services/application.service.js';
+import applicationsServices from '../services/applications.services.js';
+import challengesServices from '../services/challenges.services.js';
 import { validate } from '../middlewares/validate.js';
+import { applicationsQueryValidation } from '../validations/applications.validation.js';
 import { challengesQueryValidation } from '../validations/challenges.validation.js';
-import challengeService from '../services/challenge.service.js';
 
 const router = express.Router();
 router.get(
@@ -16,7 +16,7 @@ router.get(
       const { userId } = req.auth;
       const query = req.query;
 
-      const data = await applicationService.getApplicationsListForUser({
+      const data = await applicationsServices.getApplicationsListForUser({
         userId,
         query,
       });
@@ -39,7 +39,7 @@ router.get(
     try {
       const { userId, role } = req.auth;
       const query = req.query;
-      const data = await challengeService.getChallengesListForUser({
+      const data = await challengesServices.getChallengesListForUser({
         query,
         userId,
         role,

@@ -4,7 +4,7 @@ import {
   challengesPatchValidation,
   challengesQueryValidation,
 } from '../validations/challenges.validation.js';
-import challengeService from '../services/challenge.service.js';
+import challengeService from '../services/challenges.services.js';
 import { validate } from '../middlewares/validate.js';
 
 const router = express.Router();

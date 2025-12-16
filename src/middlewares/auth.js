@@ -16,7 +16,7 @@ const verifyRefreshToken = expressjwt({
 function validateEmailAndPassword(req, res, next) {
   const { email, password } = req.body;
   if (!email || !password) {
-    const error = new Error('All Inputs Are Required');
+    const error = new Error('모든 필드를 채워주세요.');
     error.statusCode = 422;
     throw error;
   }
