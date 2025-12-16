@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
 import { ConflictException } from '../err/conflictException.js';
 import { UnauthorizedException } from '../err/unauthorizedException.js';
-
+import { worksRepo } from '../repos/works.repo.js';
 async function createUser(user) {
   const existedUser = await authRepo.findByEmail(user.email);
   if (existedUser) {
@@ -32,7 +32,10 @@ async function getUser(email, password) {
   if (!user) {
     throw new ConflictException('존자하지 않는 이메일입니다.');
   }
+
   await verifyPassword(password, user.password);
+  await evaluateAndUpdateUserRole(user.id);
+
   return filterSensitiveUserData(user);
 }
 
@@ -71,10 +74,33 @@ async function refreshToken(userId, refreshToken) {
   return { newAccessToken, newRefreshToken };
 }
 
+async function evaluateAndUpdateUserRole(userId) {
+  const [participationCount, selectedCount] = await Promise.all([
+    worksRepo.countWorksByWorkerId(userId),
+    worksRepo.findSelectedWorksCountByWorkerId(userId),
+  ]);
+
+  const isPro =
+    (participationCount >= 5 && selectedCount >= 5) ||
+    participationCount >= 10 ||
+    selectedCount >= 10;
+
+  const newRole = isPro ? 'PRO' : 'NORMAL';
+
+  await authRepo.update(userId, { role: newRole });
+
+  return {
+    role: newRole,
+    participationCount,
+    selectedCount,
+  };
+}
+
 export default {
   createUser,
   getUser,
   updateUser,
   createToken,
   refreshToken,
+  evaluateAndUpdateUserRole,
 };

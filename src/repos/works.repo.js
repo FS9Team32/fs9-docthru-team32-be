@@ -112,13 +112,6 @@ async function countWorksByChallengeId(challengeId, tx) {
   });
 }
 
-async function findSelectedWorksCountByWorkerId(workerId, tx) {
-  const db = tx || prisma;
-  return db.work.count({
-    where: { workerId: Number(workerId), isSelected: true },
-  });
-}
-
 async function findWorkById(workId, tx) {
   const db = tx || prisma;
   return db.work.findUnique({
@@ -151,6 +144,22 @@ async function deleteWork(workId, tx) {
   const db = tx || prisma;
   return await db.work.delete({ where: { id: Number(workId) } });
 }
+async function countWorksByWorkerId(workerId, tx) {
+  const db = tx || prisma;
+  return db.work.count({
+    where: { workerId: Number(workerId) },
+  });
+}
+
+async function findSelectedWorksCountByWorkerId(workerId, tx) {
+  const db = tx || prisma;
+  return db.work.count({
+    where: {
+      workerId: Number(workerId),
+      isSelected: true,
+    },
+  });
+}
 
 export const worksRepo = {
   createWork,
@@ -158,6 +167,7 @@ export const worksRepo = {
   findWorksListWithRankByChallengeId,
   countWorksByChallengeId,
   findSelectedWorksCountByWorkerId,
+  countWorksByWorkerId,
   findWorkById,
   updateWork,
   deleteWork,
