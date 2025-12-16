@@ -71,7 +71,7 @@ async function createWork(workData) {
 
 async function getChallengeWorksList(challengeId, { page = 1, limit = 10 }) {
   // 1. 챌린지 존재 확인
-  const challenge = await challengesRepo.findChallengeById(challengeId);
+  const challenge = await challengesRepo.findChallengeById({ challengeId });
   if (!challenge) {
     throw new NotFoundException(
       '챌린지가 존재하지 않습니다. 다시 확인해 주세요.',
