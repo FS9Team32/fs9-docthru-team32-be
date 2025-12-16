@@ -1,4 +1,4 @@
-import { notificationsRepo } from '../repository/notifications.repo.js';
+import { notificationsRepo } from '../repos/notifications.repo.js';
 import { isAuthorized } from '../utils/permission.js';
 import { NotFoundException } from '../err/notFoundException.js';
 

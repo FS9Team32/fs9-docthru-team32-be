@@ -1,6 +1,6 @@
 import { prisma } from '../db/prisma.js';
-import { challengesRepo } from '../repository/challenges.repo.js';
-import { applicationsRepo } from '../repository/applications.repo.js';
+import { challengesRepo } from '../repos/challenges.repo.js';
+import { applicationsRepo } from '../repos/applications.repo.js';
 import { isAuthorized } from '../utils/permission.js';
 import { NotFoundException } from '../err/notFoundException.js';
 import { ConflictException } from '../err/conflictException.js';

@@ -1,5 +1,5 @@
 import express from 'express';
-import authService from '../services/auth.service.js';
+import authServices from '../services/auth.services.js';
 import auth from '../middlewares/auth.js';
 import { BadRequestException } from '../err/badRequestException.js';
 const authRouter = express.Router();
@@ -11,11 +11,11 @@ authRouter.post('/signup', async (req, res, next) => {
       throw new BadRequestException('All Inputs Are Required');
     }
 
-    const user = await authService.createUser({ email, nickname, password });
-    const accessToken = authService.createToken(user);
-    const refreshToken = authService.createToken(user, 'refresh');
+    const user = await authServices.createUser({ email, nickname, password });
+    const accessToken = authServices.createToken(user);
+    const refreshToken = authServices.createToken(user, 'refresh');
 
-    await authService.updateUser(user.id, { refreshToken });
+    await authServices.updateUser(user.id, { refreshToken });
     res.status(201).json({
       ...user,
       accessToken,
@@ -33,11 +33,11 @@ authRouter.post('/login', async (req, res, next) => {
       throw new BadRequestException('Email and Password is Required');
     }
 
-    const user = await authService.getUser(email, password);
-    const accessToken = authService.createToken(user);
-    const refreshToken = authService.createToken(user, 'refresh');
+    const user = await authServices.getUser(email, password);
+    const accessToken = authServices.createToken(user);
+    const refreshToken = authServices.createToken(user, 'refresh');
 
-    await authService.updateUser(user.id, { refreshToken });
+    await authServices.updateUser(user.id, { refreshToken });
 
     res.json({
       ...user,
@@ -53,7 +53,7 @@ authRouter.post('/logout', auth.verifyAccessToken, async (req, res, next) => {
   try {
     const { userId } = req.auth;
 
-    await authService.updateUser(userId, { refreshToken: null });
+    await authServices.updateUser(userId, { refreshToken: null });
 
     res.status(200).json({ message: 'Logout successful' });
   } catch (error) {
@@ -73,7 +73,7 @@ authRouter.post(
       }
 
       const { newAccessToken, newRefreshToken } =
-        await authService.refreshToken(userId, refreshToken);
+        await authServices.refreshToken(userId, refreshToken);
 
       return res.json({
         accessToken: newAccessToken,

@@ -1,5 +1,5 @@
-import { commentsRepo } from '../repository/comments.repo.js';
-import { worksRepo } from '../repository/works.repo.js';
+import { commentsRepo } from '../repos/comments.repo.js';
+import { worksRepo } from '../repos/works.repo.js';
 import { NotFoundException } from '../err/notFoundException.js';
 import { isAuthorized } from '../utils/permission.js';
 

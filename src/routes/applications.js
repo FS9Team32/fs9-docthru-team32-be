@@ -1,6 +1,6 @@
 // src/routes/applications.routes.js
 import express from 'express';
-import applicationService from '../services/application.service.js';
+import applicationsServices from '../services/applications.services.js';
 import auth from '../middlewares/auth.js';
 import {
   applicationsValidation,
@@ -24,7 +24,7 @@ router.post(
         ...data,
       };
 
-      const created = await applicationService.createApplication(dto);
+      const created = await applicationsServices.createApplication(dto);
       res.status(200).json({
         success: true,
         application: created,
@@ -43,7 +43,7 @@ router.get(
   async (req, res, next) => {
     try {
       const query = req.query;
-      const data = await applicationService.getApplicationsListForAdmin({
+      const data = await applicationsServices.getApplicationsListForAdmin({
         query,
       });
 
@@ -63,7 +63,7 @@ router.get(
   async (req, res, next) => {
     try {
       const { applicationId } = req.params;
-      const application = await applicationService.getApplicationById({
+      const application = await applicationsServices.getApplicationById({
         applicationId: Number(applicationId),
       });
       res.status(200).json({
@@ -88,7 +88,7 @@ router.patch(
     try {
       const { applicationId } = req.params;
       const { status, adminFeedback } = req.body;
-      const updated = await applicationService.updateApplication({
+      const updated = await applicationsServices.updateApplication({
         applicationId: Number(applicationId),
         status,
         adminFeedback,
@@ -114,7 +114,7 @@ router.delete(
       const { applicationId } = req.params;
       const { userId } = req.auth;
 
-      await applicationService.deleteApplication({
+      await applicationsServices.deleteApplication({
         applicationId: Number(applicationId),
         userId: Number(userId),
       });
