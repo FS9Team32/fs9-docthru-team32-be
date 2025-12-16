@@ -8,6 +8,7 @@ import worksRouter from './works.js';
 import worksCommentsRouter from './works.comments.js';
 import commentsRouter from './comments.js';
 import worksLikesRouter from './works.likes.js';
+import notificationsRouter from './notifications.js';
 
 export const router = express.Router();
 
@@ -28,5 +29,6 @@ router.use('/works', worksRouter);
 router.use('/works/:workId/comments', worksCommentsRouter);
 router.use('/comments', commentsRouter);
 router.use('/works/:workId/likes', worksLikesRouter);
+router.use('/users/me/notifications', notificationsRouter);
 
 export default router;
