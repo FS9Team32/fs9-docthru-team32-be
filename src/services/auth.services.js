@@ -6,23 +6,16 @@ import { ConflictException } from '../err/conflictException.js';
 import { UnauthorizedException } from '../err/unauthorizedException.js';
 
 async function createUser(user) {
-  try {
-    const existedUser = await authRepo.findByEmail(user.email);
-    if (existedUser) {
-      throw new ConflictException('Email Already Exists');
-    }
-    const hashedPassword = await hashPassword(user.password);
-    const createdUser = await authRepo.save({
-      ...user,
-      password: hashedPassword,
-    });
-    return filterSensitiveUserData(createdUser);
-  } catch (error) {
-    if (error.statusCode === 409) throw error;
-    const customError = new Error('DB Error Accured');
-    customError.code = 500;
-    throw customError;
+  const existedUser = await authRepo.findByEmail(user.email);
+  if (existedUser) {
+    throw new ConflictException('이미 존재하는 이메일입니다.');
   }
+  const hashedPassword = await hashPassword(user.password);
+  const createdUser = await authRepo.save({
+    ...user,
+    password: hashedPassword,
+  });
+  return filterSensitiveUserData(createdUser);
 }
 
 function hashPassword(password) {
@@ -35,30 +28,23 @@ function filterSensitiveUserData(user) {
 }
 
 async function getUser(email, password) {
-  try {
-    const user = await authRepo.findByEmail(email);
-    if (!user) {
-      throw new ConflictException('Email Does Not Exists');
-    }
-    await verifyPassword(password, user.password);
-    return filterSensitiveUserData(user);
-  } catch (error) {
-    if (error.statusCode === 401) throw error;
-    const customError = new Error('DB Error Accured');
-    customError.code = 500;
-    throw customError;
+  const user = await authRepo.findByEmail(email);
+  if (!user) {
+    throw new ConflictException('존자하지 않는 이메일입니다.');
   }
+  await verifyPassword(password, user.password);
+  return filterSensitiveUserData(user);
 }
 
 async function verifyPassword(inputPassword, password) {
   const isMatch = await bcrypt.compare(inputPassword, password);
   if (!isMatch) {
-    throw new UnauthorizedException('Incorrect Password');
+    throw new UnauthorizedException('비밀번호가 틀렸습니다.');
   }
 }
 
 function createToken(user, type) {
-  const payload = { userId: user.id };
+  const payload = { userId: user.id, role: user.role };
   const secret =
     type === 'refresh' ? config.JWT_REFRESH_SECRET : config.JWT_SECRET;
   const expiresIn = type === 'refresh' ? '2w' : '1h';
