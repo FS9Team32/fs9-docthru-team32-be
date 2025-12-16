@@ -1,5 +1,6 @@
 import express from 'express';
 import auth from '../middlewares/auth.js';
+import authServices from '../services/auth.services.js';
 import applicationsServices from '../services/applications.services.js';
 import challengesServices from '../services/challenges.services.js';
 import { validate } from '../middlewares/validate.js';
@@ -14,6 +15,19 @@ const router = express.Router();
  *   name: Users
  *   description: 사용자 관련 API
  */
+
+router.get('/me', auth.verifyAccessToken, async (req, res, next) => {
+  try {
+    const { userId } = req.auth;
+    const data = await authServices.getUserById(userId);
+    res.status(200).json({
+      success: true,
+      ...data,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 /**
  * @swagger
