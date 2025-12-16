@@ -59,10 +59,10 @@ async function updateUser(id, data) {
 async function refreshToken(userId, refreshToken) {
   const user = await authRepo.findById(userId);
   if (!user || !user.refreshToken) {
-    throw new UnauthorizedException('Unauthorized Error');
+    throw new UnauthorizedException('권한이 필요합니다.');
   }
   if (user.refreshToken !== refreshToken) {
-    throw new UnauthorizedException('Invalid Refresh Token');
+    throw new UnauthorizedException('리프레시 토큰이 필요합니다.');
   }
 
   const newAccessToken = createToken(user);
