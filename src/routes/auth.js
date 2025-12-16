@@ -10,31 +10,52 @@ authRouter.post('/signup', async (req, res, next) => {
     if (!email || !nickname || !password) {
       throw new BadRequestException('All Inputs Are Required');
     }
+
     const user = await authService.createUser({ email, nickname, password });
-    res.status(201).json(user);
+    const accessToken = authService.createToken(user);
+    const refreshToken = authService.createToken(user, 'refresh');
+
+    await authService.updateUser(user.id, { refreshToken });
+    res.status(201).json({
+      ...user,
+      accessToken,
+      refreshToken,
+    });
   } catch (error) {
     next(error);
   }
 });
 
 authRouter.post('/login', async (req, res, next) => {
-  const { email, password } = req.body;
   try {
+    const { email, password } = req.body;
     if (!email || !password) {
       throw new BadRequestException('Email and Password is Required');
     }
+
     const user = await authService.getUser(email, password);
     const accessToken = authService.createToken(user);
     const refreshToken = authService.createToken(user, 'refresh');
 
     await authService.updateUser(user.id, { refreshToken });
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: false,
+    res.json({
+      ...user,
+      accessToken,
+      refreshToken,
     });
-    res.json({ ...user, accessToken });
+  } catch (error) {
+    next(error);
+  }
+});
+
+authRouter.post('/logout', auth.verifyAccessToken, async (req, res, next) => {
+  try {
+    const { userId } = req.auth;
+
+    await authService.updateUser(userId, { refreshToken: null });
+
+    res.status(200).json({ message: 'Logout successful' });
   } catch (error) {
     next(error);
   }
@@ -46,19 +67,20 @@ authRouter.post(
   async (req, res, next) => {
     try {
       const { userId } = req.auth;
-      const refreshToken = req.cookies.refreshToken;
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
+        throw new BadRequestException('RefreshToken is required');
+      }
+
       const { newAccessToken, newRefreshToken } =
         await authService.refreshToken(userId, refreshToken);
 
-      res.cookie('refreshToken', newRefreshToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: false,
-        path: '/token/refresh',
+      return res.json({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
       });
-      return res.json({ accessToken: newAccessToken });
     } catch (error) {
-      return next(error);
+      next(error);
     }
   },
 );

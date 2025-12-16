@@ -30,7 +30,6 @@ router.post(
 
 router.get(
   '/',
-  auth.verifyAccessToken,
   validate(challengesQueryValidation, 'query'),
   async (req, res, next) => {
     try {

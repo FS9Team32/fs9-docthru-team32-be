@@ -26,6 +26,16 @@ Content-Type: application/json
     "password": "test"
 }
 
+###
+POST http://localhost:3000/auth/logout
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjksImlhdCI6MTc2NTg1MTI4NSwiZXhwIjoxNzY1ODU0ODg1fQ.OxTOZhpKubj-usgSylsvJpsKFTGY6Nd4E3JnOlXfNpc
+
+{
+    "email": "test1@test.com",
+    "password": "test"
+}
+
 
 ###
 POST http://localhost:3000/auth/token/refresh
