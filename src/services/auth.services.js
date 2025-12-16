@@ -32,11 +32,10 @@ async function getUser(email, password) {
   if (!user) {
     throw new ConflictException('존자하지 않는 이메일입니다.');
   }
-
   await verifyPassword(password, user.password);
   await evaluateAndUpdateUserRole(user.id);
-
-  return filterSensitiveUserData(user);
+  const updatedUser = await authRepo.findById(user.id);
+  return filterSensitiveUserData(updatedUser);
 }
 
 async function verifyPassword(inputPassword, password) {

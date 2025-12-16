@@ -34,7 +34,13 @@ async function closeExpiredChallenges() {
   }
 }
 
-// (테스트용)
 export function startChallengeScheduler() {
-  cron.schedule('* * * * *', closeExpiredChallenges);
+  // 매 5분
+  cron.schedule('/5* * * * *', async () => {
+    try {
+      await closeExpiredChallenges();
+    } catch (e) {
+      console.error('[Challenge Scheduler Error]', e);
+    }
+  });
 }
