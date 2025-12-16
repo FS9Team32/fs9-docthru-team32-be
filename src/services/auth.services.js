@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
 import { ConflictException } from '../err/conflictException.js';
 import { UnauthorizedException } from '../err/unauthorizedException.js';
+import { NotFoundException } from '../err/notFoundException.js';
 import { worksRepo } from '../repos/works.repo.js';
 async function createUser(user) {
   const existedUser = await authRepo.findByEmail(user.email);
@@ -30,12 +31,20 @@ function filterSensitiveUserData(user) {
 async function getUser(email, password) {
   const user = await authRepo.findByEmail(email);
   if (!user) {
-    throw new ConflictException('존자하지 않는 이메일입니다.');
+    throw new ConflictException('존재하지 않는 이메일입니다.');
   }
   await verifyPassword(password, user.password);
   await evaluateAndUpdateUserRole(user.id);
   const updatedUser = await authRepo.findById(user.id);
   return filterSensitiveUserData(updatedUser);
+}
+
+async function getUserById(id) {
+  const user = await authRepo.findById(id);
+  if (!user) {
+    throw new NotFoundException('존재하지 않는 유저입니다.');
+  }
+  return filterSensitiveUserData(user);
 }
 
 async function verifyPassword(inputPassword, password) {
@@ -98,6 +107,7 @@ async function evaluateAndUpdateUserRole(userId) {
 export default {
   createUser,
   getUser,
+  getUserById,
   updateUser,
   createToken,
   refreshToken,
