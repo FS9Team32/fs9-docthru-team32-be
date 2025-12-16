@@ -16,6 +16,38 @@ const router = express.Router();
  *   description: 사용자 관련 API
  */
 
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: 내 정보 조회
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 id:
+ *                   type: integer
+ *                 email:
+ *                   type: string
+ *                 nickname:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *       401:
+ *         description: 인증 실패
+ *       404:
+ *         description: 사용자를 찾을 수 없음
+ */
 router.get('/me', auth.verifyAccessToken, async (req, res, next) => {
   try {
     const { userId } = req.auth;
