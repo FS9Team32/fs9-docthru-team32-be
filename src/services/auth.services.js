@@ -5,7 +5,7 @@ import { config } from '../config/config.js';
 import { ConflictException } from '../err/conflictException.js';
 import { UnauthorizedException } from '../err/unauthorizedException.js';
 import { NotFoundException } from '../err/notFoundException.js';
-
+import { worksRepo } from '../repos/works.repo.js';
 async function createUser(user) {
   const existedUser = await authRepo.findByEmail(user.email);
   if (existedUser) {
@@ -34,7 +34,9 @@ async function getUser(email, password) {
     throw new ConflictException('존재하지 않는 이메일입니다.');
   }
   await verifyPassword(password, user.password);
-  return filterSensitiveUserData(user);
+  await evaluateAndUpdateUserRole(user.id);
+  const updatedUser = await authRepo.findById(user.id);
+  return filterSensitiveUserData(updatedUser);
 }
 
 async function getUserById(id) {
@@ -80,6 +82,28 @@ async function refreshToken(userId, refreshToken) {
   return { newAccessToken, newRefreshToken };
 }
 
+async function evaluateAndUpdateUserRole(userId) {
+  const [participationCount, selectedCount] = await Promise.all([
+    worksRepo.countWorksByWorkerId(userId),
+    worksRepo.findSelectedWorksCountByWorkerId(userId),
+  ]);
+
+  const isPro =
+    (participationCount >= 5 && selectedCount >= 5) ||
+    participationCount >= 10 ||
+    selectedCount >= 10;
+
+  const newRole = isPro ? 'PRO' : 'NORMAL';
+
+  await authRepo.update(userId, { role: newRole });
+
+  return {
+    role: newRole,
+    participationCount,
+    selectedCount,
+  };
+}
+
 export default {
   createUser,
   getUser,
@@ -87,4 +111,5 @@ export default {
   updateUser,
   createToken,
   refreshToken,
+  evaluateAndUpdateUserRole,
 };

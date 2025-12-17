@@ -3,16 +3,17 @@ import { router } from './routes/index.js';
 import { logger } from './middlewares/logger.js';
 import { requestTimer } from './middlewares/requestTimer.js';
 import { config, isDevelopment, isProduction } from './config/config.js';
+import { startChallengeScheduler } from './schedulers/challenges.scheduler.js';
+
 import { errorHandler } from './middlewares/errorHandler.js';
 import { disconnectDB } from './db/prisma.js';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
 
 const app = express();
 
+startChallengeScheduler();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 const whiteList = config.FRONT_URL
   ? config.FRONT_URL.split(',').map((url) => url.trim())
@@ -20,13 +21,13 @@ const whiteList = config.FRONT_URL
 
 app.use(
   cors({
-    origin: isProduction ? whiteList : true, // 프로덕션은 화이트리스트, 개발은 모두 허용(true)
+    origin: isProduction() ? whiteList : true, // 프로덕션은 화이트리스트, 개발은 모두 허용(true)
     credentials: true,
     optionsSuccessStatus: 200,
   }),
 );
 
-if (isDevelopment) {
+if (isDevelopment()) {
   app.use(logger);
   app.use(requestTimer);
 }
