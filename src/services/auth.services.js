@@ -92,6 +92,16 @@ async function evaluateAndUpdateUserRole(userId) {
     (participationCount >= 5 && selectedCount >= 5) ||
     participationCount >= 10 ||
     selectedCount >= 10;
+  const user = await authRepo.findById(userId);
+
+  // 어드민은 등급 평가 대상에서 제외
+  if (user.role === 'ADMIN') {
+    return {
+      role: user.role,
+      participationCount: 0,
+      selectedCount: 0,
+    };
+  }
 
   const newRole = isPro ? 'PRO' : 'NORMAL';
 
