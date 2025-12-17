@@ -1,10 +1,11 @@
 import { prisma } from '../db/prisma.js';
 
-async function findChallengeList({ where, skip, take, orderBy }) {
-  const [totalCount, originList] = await prisma.$transaction([
-    prisma.challenge.count({ where }),
+async function findChallengeList({ where, skip, take, orderBy }, tx) {
+  const db = tx || prisma;
+  const [totalCount, originList] = await db.$transaction([
+    db.challenge.count({ where }),
 
-    prisma.challenge.findMany({
+    db.challenge.findMany({
       where,
       skip,
       take,
@@ -36,8 +37,9 @@ async function createChallenge(challengeData, tx) {
   return db.challenge.create({ data: challengeData });
 }
 
-async function updateChallenge({ challengeId, data }) {
-  return prisma.challenge.update({
+async function updateChallenge({ challengeId, data }, tx) {
+  const db = tx || prisma;
+  return db.challenge.update({
     where: { id: Number(challengeId) },
     data,
   });
@@ -51,8 +53,9 @@ async function updateChallengeStatus(challengeId, status, tx) {
   });
 }
 
-async function findChallengeById({ challengeId }) {
-  const originData = await prisma.challenge.findUnique({
+async function findChallengeById({ challengeId }, tx) {
+  const db = tx || prisma;
+  const originData = await db.challenge.findUnique({
     where: { id: Number(challengeId) },
     include: {
       creator: {
@@ -75,8 +78,9 @@ async function findChallengeById({ challengeId }) {
     workCount: _count.works,
   };
 }
-async function deleteChallenge({ challengeId }) {
-  return prisma.challenge.delete({
+async function deleteChallenge({ challengeId }, tx) {
+  const db = tx || prisma;
+  return db.challenge.delete({
     where: { id: Number(challengeId) },
   });
 }
