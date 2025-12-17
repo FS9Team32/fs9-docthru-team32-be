@@ -155,12 +155,11 @@ router.get(
   validate(challengesQueryValidation, 'query'),
   async (req, res, next) => {
     try {
-      const { userId, role } = req.auth;
+      const { userId } = req.auth;
       const query = req.query;
       const data = await challengesServices.getChallengesListForUser({
         query,
         userId,
-        role,
       });
       res.status(200).json({
         success: true,

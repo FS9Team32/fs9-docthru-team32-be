@@ -1,7 +1,6 @@
 import { prisma } from '../db/prisma.js';
 import { challengesRepo } from '../repos/challenges.repo.js';
 import { applicationsRepo } from '../repos/applications.repo.js';
-import { isAuthorized } from '../utils/permission.js';
 import { NotFoundException } from '../err/notFoundException.js';
 import { ConflictException } from '../err/conflictException.js';
 
@@ -46,7 +45,7 @@ export async function getChallengesList({ query }) {
     list,
   };
 }
-export async function getChallengesListForUser({ query, userId, role }) {
+export async function getChallengesListForUser({ query, userId }) {
   const {
     page = 1,
     pageSize = 10,
@@ -60,8 +59,13 @@ export async function getChallengesListForUser({ query, userId, role }) {
   const skip = (page - 1) * pageSize;
   const orderBy = orderby ? { [orderby]: 'desc' } : { createdAt: 'desc' };
 
+  // 생각해보니까 소유한 챌린지가 아니라 참여중인 챌린지더라고요...
   const where = {
-    creatorId: userId, // 🔥 내가 만든 챌린지만
+    works: {
+      some: {
+        workerId: userId,
+      },
+    },
 
     ...(status && { status }),
     ...(category && { category }),
@@ -81,8 +85,6 @@ export async function getChallengesListForUser({ query, userId, role }) {
     take: pageSize,
     orderBy,
   });
-
-  list.forEach((c) => isAuthorized(c.creatorId, userId, role));
 
   return {
     totalCount,
