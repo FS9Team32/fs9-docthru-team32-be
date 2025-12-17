@@ -9,6 +9,69 @@ import {
 } from '../validations/auth.validation.js';
 const authRouter = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: 인증 관련 API
+ */
+
+/**
+ * @swagger
+ * /auth/signup:
+ *   post:
+ *     summary: 회원가입
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - nickname
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: 이메일
+ *               nickname:
+ *                 type: string
+ *                 description: 닉네임
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: 비밀번호 (최소 6자)
+ *     responses:
+ *       201:
+ *         description: 회원가입 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 id:
+ *                   type: integer
+ *                 email:
+ *                   type: string
+ *                 nickname:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *       400:
+ *         description: 잘못된 요청
+ *       409:
+ *         description: 이미 존재하는 이메일
+ */
 authRouter.post(
   '/signup',
   validate(signupValidation, 'body'),
@@ -32,6 +95,60 @@ authRouter.post(
   },
 );
 
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: 로그인
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: 이메일
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: 비밀번호
+ *     responses:
+ *       200:
+ *         description: 로그인 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 id:
+ *                   type: integer
+ *                 email:
+ *                   type: string
+ *                 nickname:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *       400:
+ *         description: 잘못된 요청
+ *       401:
+ *         description: 인증 실패
+ *       404:
+ *         description: 사용자를 찾을 수 없음
+ */
 authRouter.post(
   '/login',
   validate(loginValidation, 'body'),
@@ -57,6 +174,31 @@ authRouter.post(
   },
 );
 
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: 로그아웃
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 로그아웃 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: '로그아웃 성공'
+ *       401:
+ *         description: 인증 실패
+ */
 authRouter.post('/logout', auth.verifyAccessToken, async (req, res, next) => {
   try {
     const { userId } = req.auth;
@@ -69,6 +211,46 @@ authRouter.post('/logout', auth.verifyAccessToken, async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /auth/token/refresh:
+ *   post:
+ *     summary: 토큰 갱신
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: 리프레시 토큰
+ *     responses:
+ *       200:
+ *         description: 토큰 갱신 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *       400:
+ *         description: 잘못된 요청
+ *       401:
+ *         description: 유효하지 않은 토큰
+ */
 authRouter.post(
   '/token/refresh',
   auth.verifyRefreshToken,
