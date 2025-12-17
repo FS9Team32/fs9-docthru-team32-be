@@ -21,13 +21,13 @@ const whiteList = config.FRONT_URL
 
 app.use(
   cors({
-    origin: isProduction() ? whiteList : true, // 프로덕션은 화이트리스트, 개발은 모두 허용(true)
+    origin: isProduction ? whiteList : true, // 프로덕션은 화이트리스트, 개발은 모두 허용(true)
     credentials: true,
     optionsSuccessStatus: 200,
   }),
 );
 
-if (isDevelopment()) {
+if (isDevelopment) {
   app.use(logger);
   app.use(requestTimer);
 }
