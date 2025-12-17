@@ -4,7 +4,7 @@ import { NotFoundException } from '../err/notFoundException.js';
 import { ConflictException } from '../err/conflictException.js';
 
 async function createLike({ workId, userId }) {
-  const work = await worksRepo.findWorkById(workId);
+  const work = await worksRepo.findWorkById({ workId });
   if (!work) {
     throw new NotFoundException('작업물을 찾을 수 없습니다.');
   }

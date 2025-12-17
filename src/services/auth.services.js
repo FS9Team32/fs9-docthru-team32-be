@@ -30,13 +30,14 @@ function filterSensitiveUserData(user) {
 
 async function getUser(email, password) {
   const user = await authRepo.findByEmail(email);
+
   if (!user) {
     throw new ConflictException('존재하지 않는 이메일입니다.');
   }
   await verifyPassword(password, user.password);
-  await evaluateAndUpdateUserRole(user.id);
-  const updatedUser = await authRepo.findById(user.id);
-  return filterSensitiveUserData(updatedUser);
+
+  const processedUser = await evaluateAndUpdateUserRole(user);
+  return filterSensitiveUserData(processedUser);
 }
 
 async function getUserById(id) {
@@ -82,7 +83,13 @@ async function refreshToken(userId, refreshToken) {
   return { newAccessToken, newRefreshToken };
 }
 
-async function evaluateAndUpdateUserRole(userId) {
+async function evaluateAndUpdateUserRole(user) {
+  if (user.role !== 'NORMAL') {
+    return user;
+  }
+
+  const userId = user.id;
+
   const [participationCount, selectedCount] = await Promise.all([
     worksRepo.countWorksByWorkerId(userId),
     worksRepo.findSelectedWorksCountByWorkerId(userId),
@@ -93,15 +100,11 @@ async function evaluateAndUpdateUserRole(userId) {
     participationCount >= 10 ||
     selectedCount >= 10;
 
-  const newRole = isPro ? 'PRO' : 'NORMAL';
+  if (!isPro) {
+    return user;
+  }
 
-  await authRepo.update(userId, { role: newRole });
-
-  return {
-    role: newRole,
-    participationCount,
-    selectedCount,
-  };
+  return authRepo.update(userId, { role: 'PRO' });
 }
 
 export default {
