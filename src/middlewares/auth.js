@@ -8,15 +8,15 @@ const verifyAccessToken = expressjwt({
 });
 
 const verifyRefreshToken = expressjwt({
-  secret: config.JWT_SECRET,
+  secret: config.JWT_REFRESH_SECRET,
   algorithms: ['HS256'],
-  getToken: (req) => req.cookies.refreshToken,
+  getToken: (req) => req.body.refreshToken,
 });
 
 function validateEmailAndPassword(req, res, next) {
   const { email, password } = req.body;
   if (!email || !password) {
-    const error = new Error('All Inputs Are Required');
+    const error = new Error('모든 필드를 채워주세요.');
     error.statusCode = 422;
     throw error;
   }

@@ -29,6 +29,7 @@ model User {
   works                 Work[]
   comments              Comment[]
   likes                 Like[]
+  notifications         Notification[]
 
   @@map("users")
 }
@@ -139,4 +140,14 @@ model Like {
   // 복합 기본키 설정 (한 유저가 한 작업물에 중복 좋아요 방지)
   @@unique([workId, userId])
   @@map("work_likes")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  message   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+  @@map("notifications")
 }

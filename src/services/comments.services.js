@@ -1,10 +1,10 @@
-import { commentsRepo } from '../repository/comments.repo.js';
-import { worksRepo } from '../repository/works.repo.js';
+import { commentsRepo } from '../repos/comments.repo.js';
+import { worksRepo } from '../repos/works.repo.js';
 import { NotFoundException } from '../err/notFoundException.js';
 import { isAuthorized } from '../utils/permission.js';
 
 async function workExistece(workId) {
-  const work = await worksRepo.findWorkById(workId);
+  const work = await worksRepo.findWorkById({ workId });
   if (!work) {
     throw new NotFoundException('작업물을 찾을 수 없습니다');
   }
@@ -35,14 +35,14 @@ async function commentExistence(commentId) {
 
 async function updateComment({ commentId, userId, role, content }) {
   const comment = await commentExistence(commentId);
-  isAuthorized(comment.workId, userId, role);
+  isAuthorized(comment.authorId, userId, role);
   const data = { content };
   return commentsRepo.updateComment({ commentId, data });
 }
 
 async function deleteComment({ commentId, userId, role }) {
   const comment = await commentExistence(commentId);
-  isAuthorized(comment.workId, userId, role);
+  isAuthorized(comment.authorId, userId, role);
   return commentsRepo.deleteComment(commentId);
 }
 

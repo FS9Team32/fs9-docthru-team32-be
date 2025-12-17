@@ -1,7 +1,6 @@
 import { prisma } from '../db/prisma.js';
-import { challengesRepo } from '../repository/challenges.repo.js';
-import { applicationsRepo } from '../repository/applications.repo.js';
-import { isAuthorized } from '../utils/permission.js';
+import { challengesRepo } from '../repos/challenges.repo.js';
+import { applicationsRepo } from '../repos/applications.repo.js';
 import { NotFoundException } from '../err/notFoundException.js';
 import { ConflictException } from '../err/conflictException.js';
 
@@ -46,18 +45,64 @@ export async function getChallengesList({ query }) {
     list,
   };
 }
+export async function getChallengesListForUser({ query, userId }) {
+  const {
+    page = 1,
+    pageSize = 10,
+    status,
+    category,
+    type,
+    orderby,
+    keyword,
+  } = query;
 
-async function getMyChallenges(userId) {
-  return challengesRepo.findChallengesByCreatorId(userId);
+  const skip = (page - 1) * pageSize;
+  const orderBy = orderby ? { [orderby]: 'desc' } : { createdAt: 'desc' };
+
+  // 생각해보니까 소유한 챌린지가 아니라 참여중인 챌린지더라고요...
+  const where = {
+    works: {
+      some: {
+        workerId: userId,
+      },
+    },
+
+    ...(status && { status }),
+    ...(category && { category }),
+    ...(type && { documentType: type }),
+    ...(keyword && {
+      OR: [
+        { title: { contains: keyword, mode: 'insensitive' } },
+        { description: { contains: keyword, mode: 'insensitive' } },
+        { category: { contains: keyword, mode: 'insensitive' } },
+      ],
+    }),
+  };
+
+  const [totalCount, list] = await challengesRepo.findChallengeList({
+    where,
+    skip,
+    take: pageSize,
+    orderBy,
+  });
+
+  return {
+    totalCount,
+    page,
+    pageSize,
+    list,
+  };
 }
 
 async function getChallengeById({ challengeId, userId }) {
-  const challenge = await challengesRepo.findChallengeById({ challengeId });
+  const challenge = await challengesRepo.findChallengeById({
+    challengeId,
+    userId,
+  });
 
   if (!challenge) {
     throw new NotFoundException('챌린지를 찾을 수 없습니다.');
   }
-  isAuthorized(challenge.creatorId, userId, challenge.creator.role);
   return challenge;
 }
 
@@ -80,8 +125,8 @@ async function createChallenge({ applicationId }) {
       tx,
     );
 
-    const existing = await challengesRepo.findApplicationById(
-      applicationId,
+    const existing = await challengesRepo.findChallengeByApplicationId(
+      { applicationId },
       tx,
     );
 
@@ -90,8 +135,8 @@ async function createChallenge({ applicationId }) {
     }
 
     const challengeData = {
-      application: { connect: { id: application.id } },
-      creator: { connect: { id: application.creatorId } },
+      applicationId: application.id,
+      creatorId: application.creatorId,
       title: application.title,
       documentType: application.documentType,
       description: application.description,
@@ -157,7 +202,7 @@ async function deleteChallenge({ challengeId, adminFeedback }) {
 export default {
   createChallenge,
   getChallengesList,
-  getMyChallenges,
+  getChallengesListForUser,
   getChallengeById,
   updatechallenge,
   deleteChallenge,

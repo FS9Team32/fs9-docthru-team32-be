@@ -1,6 +1,6 @@
 import { prisma } from '../db/prisma.js';
-import { worksRepo } from '../repository/works.repo.js';
-import { challengesRepo } from '../repository/challenges.repo.js';
+import { worksRepo } from '../repos/works.repo.js';
+import { challengesRepo } from '../repos/challenges.repo.js';
 import { NotFoundException } from '../err/notFoundException.js';
 import { ConflictException } from '../err/conflictException.js';
 import { isAuthorized } from '../utils/permission.js';
@@ -10,7 +10,7 @@ async function createWork(workData) {
     async (tx) => {
       // 1. 챌린지 존재 여부 확인 (tx 전달)
       const challenge = await challengesRepo.findChallengeById(
-        workData.challengeId,
+        { challengeId: workData.challengeId },
         tx,
       );
       if (!challenge) {
@@ -69,9 +69,12 @@ async function createWork(workData) {
   );
 }
 
-async function getChallengeWorksList(challengeId, { page = 1, limit = 10 }) {
+async function getChallengeWorksList(
+  challengeId,
+  { page = 1, limit = 0, selected = false },
+) {
   // 1. 챌린지 존재 확인
-  const challenge = await challengesRepo.findChallengeById(challengeId);
+  const challenge = await challengesRepo.findChallengeById({ challengeId });
   if (!challenge) {
     throw new NotFoundException(
       '챌린지가 존재하지 않습니다. 다시 확인해 주세요.',
@@ -86,7 +89,8 @@ async function getChallengeWorksList(challengeId, { page = 1, limit = 10 }) {
     await worksRepo.findWorksListWithRankByChallengeId({
       challengeId,
       skip,
-      take,
+      take: take ? take : undefined,
+      selected: selected ? true : undefined,
     });
 
   return { totalCount, rankedList };
@@ -96,8 +100,8 @@ async function getChallengeWorksCount(challengeId) {
   return await worksRepo.countWorksByChallengeId(challengeId);
 }
 
-async function getWork(id) {
-  const workData = await worksRepo.findWorkById(id);
+async function getWork({ workId, userId }) {
+  const workData = await worksRepo.findWorkById({ workId, userId });
   if (!workData) {
     throw new NotFoundException('작업물이 존재하지 않습니다.');
   }
@@ -105,9 +109,9 @@ async function getWork(id) {
 }
 
 async function updateWork({ workId, userId, role, content }) {
-  const prevWork = await getWork(workId);
+  const prevWork = await getWork({ workId });
 
-  isAuthorized(prevWork.workId, userId, role);
+  isAuthorized(prevWork.workerId, userId, role);
 
   const data = {
     content,
@@ -122,9 +126,9 @@ async function updateWork({ workId, userId, role, content }) {
 }
 
 async function deleteWork({ workId, userId, role }) {
-  const prevWork = await getWork(workId);
+  const prevWork = await getWork({ workId });
 
-  isAuthorized(prevWork.workId, userId, role);
+  isAuthorized(prevWork.workerId, userId, role);
 
   const deletedWork = await worksRepo.deleteWork(workId);
   return deletedWork;
