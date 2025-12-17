@@ -7,11 +7,15 @@ import { worksValidation } from '../validations/works.validation.js';
 const router = express.Router({ mergeParams: true });
 
 // 상세 조회
-router.get('/:workId', async (req, res, next) => {
+router.get('/:workId', auth.verifyAccessToken, async (req, res, next) => {
   try {
     const { workId } = req.params;
+    const { userId } = req.auth;
 
-    const work = await worksServices.getWork(Number(workId));
+    const work = await worksServices.getWork({
+      workId: Number(workId),
+      userId,
+    });
 
     res.status(200).json({
       success: true,
