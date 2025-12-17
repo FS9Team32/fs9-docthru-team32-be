@@ -53,7 +53,7 @@ async function updateChallengeStatus(challengeId, status, tx) {
   });
 }
 
-async function findChallengeById({ challengeId }, tx) {
+async function findChallengeById({ challengeId, userId }, tx) {
   const db = tx || prisma;
   const originData = await db.challenge.findUnique({
     where: { id: Number(challengeId) },
@@ -68,14 +68,26 @@ async function findChallengeById({ challengeId }, tx) {
       _count: {
         select: { works: true },
       },
+      works: userId
+        ? {
+            where: {
+              challengeId: Number(challengeId),
+              workerId: Number(userId),
+            },
+          }
+        : false,
     },
   });
 
   if (!originData) return null;
-  const { _count, ...rest } = originData;
+
+  const isWorked = !!(originData.works && originData.works.length > 0);
+  const { _count, works: _works, ...rest } = originData;
+
   return {
     ...rest,
     workCount: _count.works,
+    isWorked,
   };
 }
 

@@ -94,8 +94,11 @@ export async function getChallengesListForUser({ query, userId }) {
   };
 }
 
-async function getChallengeById({ challengeId }) {
-  const challenge = await challengesRepo.findChallengeById({ challengeId });
+async function getChallengeById({ challengeId, userId }) {
+  const challenge = await challengesRepo.findChallengeById({
+    challengeId,
+    userId,
+  });
 
   if (!challenge) {
     throw new NotFoundException('챌린지를 찾을 수 없습니다.');
