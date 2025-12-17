@@ -55,11 +55,14 @@ async function findWorksListByChallengeId(
 }
 
 async function findWorksListWithRankByChallengeId(
-  { challengeId, skip = 0, take = 10 },
+  { challengeId, skip = 0, take, selected },
   tx,
 ) {
   const db = tx || prisma;
   const where = { challengeId: Number(challengeId) };
+  if (selected) {
+    where.isSelected = true;
+  }
 
   // 1. 데이터 조회 (총 개수와 목록을 병렬로 요청하여 속도 향상)
   const [totalCount, works] = await Promise.all([
