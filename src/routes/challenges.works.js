@@ -156,12 +156,13 @@ router.post(
 router.get('/', async (req, res, next) => {
   try {
     const { challengeId } = req.params;
-    const { page, limit } = req.query;
+    const { page, limit, selected } = req.query;
 
     const { totalCount, rankedList } =
       await worksServices.getChallengeWorksList(Number(challengeId), {
         page: page ? Number(page) : undefined,
         limit: limit ? Number(limit) : undefined,
+        selected: selected ? true : undefined,
       });
 
     res.status(200).json({

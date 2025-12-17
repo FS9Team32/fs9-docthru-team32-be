@@ -69,7 +69,10 @@ async function createWork(workData) {
   );
 }
 
-async function getChallengeWorksList(challengeId, { page = 1, limit = 10 }) {
+async function getChallengeWorksList(
+  challengeId,
+  { page = 1, limit = 0, selected = false },
+) {
   // 1. 챌린지 존재 확인
   const challenge = await challengesRepo.findChallengeById({ challengeId });
   if (!challenge) {
@@ -86,7 +89,8 @@ async function getChallengeWorksList(challengeId, { page = 1, limit = 10 }) {
     await worksRepo.findWorksListWithRankByChallengeId({
       challengeId,
       skip,
-      take,
+      take: take ? take : undefined,
+      selected: selected ? true : undefined,
     });
 
   return { totalCount, rankedList };

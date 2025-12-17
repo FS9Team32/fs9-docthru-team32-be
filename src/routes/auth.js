@@ -82,7 +82,6 @@ authRouter.post(
       const user = await authServices.createUser({ email, nickname, password });
       const accessToken = authServices.createToken(user);
       const refreshToken = authServices.createToken(user, 'refresh');
-
       await authServices.updateUser(user.id, { refreshToken });
       res.status(201).json({
         success: true,
