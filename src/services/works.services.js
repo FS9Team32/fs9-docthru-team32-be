@@ -10,7 +10,7 @@ async function createWork(workData) {
     async (tx) => {
       // 1. 챌린지 존재 여부 확인 (tx 전달)
       const challenge = await challengesRepo.findChallengeById(
-        workData.challengeId,
+        { challengeId: workData.challengeId },
         tx,
       );
       if (!challenge) {
