@@ -44,6 +44,9 @@ const router = express.Router({ mergeParams: true });
  *                   format: date-time
  *                 editedAt:
  *                   format: date-time
+ *                 isLiked:
+ *                   type: boolean
+ *                   example: false
  *                 worker:
  *                   type: object
  *                   properties:

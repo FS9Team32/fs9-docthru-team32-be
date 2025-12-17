@@ -48,8 +48,15 @@ const router = express.Router();
  *                   type: integer
  *                 content:
  *                   type: string
- *                 userId:
- *                   type: integer
+ *                 authorId:
+ *                         type: integer
+ *                       author:
+ *                         type: object
+ *                         properties:
+ *                           nickname:
+ *                             type: string
+ *                           role:
+ *                             type: string
  *                 workId:
  *                   type: integer
  *                 createdAt:
