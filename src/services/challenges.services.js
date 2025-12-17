@@ -122,8 +122,8 @@ async function createChallenge({ applicationId }) {
       tx,
     );
 
-    const existing = await challengesRepo.findApplicationById(
-      applicationId,
+    const existing = await challengesRepo.findChallengeByApplicationId(
+      { applicationId },
       tx,
     );
 
@@ -132,8 +132,8 @@ async function createChallenge({ applicationId }) {
     }
 
     const challengeData = {
-      application: { connect: { id: application.id } },
-      creator: { connect: { id: application.creatorId } },
+      applicationId: application.id,
+      creatorId: application.creatorId,
       title: application.title,
       documentType: application.documentType,
       description: application.description,

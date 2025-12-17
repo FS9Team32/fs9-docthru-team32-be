@@ -78,6 +78,14 @@ async function findChallengeById({ challengeId }, tx) {
     workCount: _count.works,
   };
 }
+
+async function findChallengeByApplicationId({ applicationId }, tx) {
+  const db = tx || prisma;
+  return db.challenge.findUnique({
+    where: { applicationId: Number(applicationId) },
+  });
+}
+
 async function deleteChallenge({ challengeId }, tx) {
   const db = tx || prisma;
   return db.challenge.delete({
@@ -90,6 +98,7 @@ export const challengesRepo = {
   updateChallenge,
   findChallengeList,
   findChallengeById,
+  findChallengeByApplicationId,
   updateChallengeStatus,
   deleteChallenge,
 };
