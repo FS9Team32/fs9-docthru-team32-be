@@ -112,7 +112,7 @@ router.post(
  *           default: 1
  *         description: 페이지 번호
  *       - in: query
- *         name: limit
+ *         name: pageSize
  *         schema:
  *           type: integer
  *           default: 10
@@ -121,14 +121,25 @@ router.post(
  *         name: status
  *         schema:
  *           type: string
- *         description: 상태 필터 (PENDING, ACCEPTED, REJECTED)
+ *           enum: [PENDING, APPROVED, REJECTED]
+ *         description: 상태 필터 (PENDING, APPROVED, REJECTED)
  *       - in: query
- *         name: sort
+ *         name: category
  *         schema:
  *           type: string
- *           enum: [asc, desc]
- *           default: desc
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: orderby
+ *         schema:
+ *           type: string
  *         description: 정렬 순서
+ *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: 조회 성공

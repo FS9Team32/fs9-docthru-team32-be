@@ -81,21 +81,32 @@ router.post(
  *           default: 1
  *         description: 페이지 번호
  *       - in: query
- *         name: limit
+ *         name: pageSize
  *         schema:
  *           type: integer
  *           default: 10
  *         description: 페이지 당 항목 수
  *       - in: query
- *         name: field
+ *         name: status
  *         schema:
  *           type: string
- *         description: 분야 필터
+ *           enum: [RECRUITING, FILLED, CLOSED]
  *       - in: query
- *         name: progress
+ *         name: category
  *         schema:
- *           type: boolean
- *         description: 진행 중 여부
+ *           type: string
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: orderby
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: 조회 성공
