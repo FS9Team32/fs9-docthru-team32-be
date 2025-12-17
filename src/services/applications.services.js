@@ -1,12 +1,13 @@
 import { applicationsRepo } from '../repos/applications.repo.js';
 import { NotFoundException } from '../err/notFoundException.js';
 import { ForbiddenException } from '../err/forbiddenException.js';
+import { isAuthorized } from '../utils/permission.js';
 
 async function createApplication(data) {
   return applicationsRepo.createApplication(data);
 }
 
-async function getApplicationById({ applicationId }) {
+async function getApplicationById({ applicationId, userId, role }) {
   const applicationData = await applicationsRepo.findApplicationById({
     applicationId,
   });
@@ -15,6 +16,7 @@ async function getApplicationById({ applicationId }) {
       '신청서가 존재하지 않습니다. 다시 확인해 주세요.',
     );
   }
+  isAuthorized(applicationData.creatorId, userId, role);
   return applicationData;
 }
 
