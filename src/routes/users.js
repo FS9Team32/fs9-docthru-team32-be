@@ -63,7 +63,7 @@ router.get('/me', auth.verifyAccessToken, async (req, res, next) => {
 
 /**
  * @swagger
- * /user/me/challenge-applications:
+ * /users/me/challenge-applications:
  *   get:
  *     summary: 내 챌린지 신청 목록 조회
  *     tags: [Users]
@@ -76,7 +76,7 @@ router.get('/me', auth.verifyAccessToken, async (req, res, next) => {
  *           type: integer
  *           default: 1
  *       - in: query
- *         name: limit
+ *         name: pageSize
  *         schema:
  *           type: integer
  *           default: 10
@@ -84,12 +84,23 @@ router.get('/me', auth.verifyAccessToken, async (req, res, next) => {
  *         name: status
  *         schema:
  *           type: string
- *           enum: [PENDING, ACCEPTED, REJECTED]
+ *           enum: [PENDING, APPROVED, REJECTED]
  *       - in: query
- *         name: sort
+ *         name: category
  *         schema:
  *           type: string
- *           enum: [asc, desc]
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: orderby
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: 조회 성공
@@ -120,7 +131,7 @@ router.get(
 
 /**
  * @swagger
- * /user/me/challenge:
+ * /users/me/challenge:
  *   get:
  *     summary: 내 챌린지 목록 조회
  *     tags: [Users]
@@ -133,18 +144,31 @@ router.get(
  *           type: integer
  *           default: 1
  *       - in: query
- *         name: limit
+ *         name: pageSize
  *         schema:
  *           type: integer
  *           default: 10
  *       - in: query
- *         name: field
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [RECRUITING, FILLED, CLOSED]
+ *       - in: query
+ *         name: category
  *         schema:
  *           type: string
  *       - in: query
- *         name: progress
+ *         name: type
  *         schema:
- *           type: boolean
+ *           type: string
+ *       - in: query
+ *         name: orderby
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: 조회 성공
@@ -155,12 +179,11 @@ router.get(
   validate(challengesQueryValidation, 'query'),
   async (req, res, next) => {
     try {
-      const { userId, role } = req.auth;
+      const { userId } = req.auth;
       const query = req.query;
       const data = await challengesServices.getChallengesListForUser({
         query,
         userId,
-        role,
       });
       res.status(200).json({
         success: true,
