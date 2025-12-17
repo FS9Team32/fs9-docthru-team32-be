@@ -4,7 +4,7 @@ import { NotFoundException } from '../err/notFoundException.js';
 import { isAuthorized } from '../utils/permission.js';
 
 async function workExistece(workId) {
-  const work = await worksRepo.findWorkById(workId);
+  const work = await worksRepo.findWorkById({ workId });
   if (!work) {
     throw new NotFoundException('작업물을 찾을 수 없습니다');
   }

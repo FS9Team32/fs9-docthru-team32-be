@@ -100,8 +100,8 @@ async function getChallengeWorksCount(challengeId) {
   return await worksRepo.countWorksByChallengeId(challengeId);
 }
 
-async function getWork(id) {
-  const workData = await worksRepo.findWorkById(id);
+async function getWork({ workId, userId }) {
+  const workData = await worksRepo.findWorkById({ workId, userId });
   if (!workData) {
     throw new NotFoundException('작업물이 존재하지 않습니다.');
   }
@@ -109,7 +109,7 @@ async function getWork(id) {
 }
 
 async function updateWork({ workId, userId, role, content }) {
-  const prevWork = await getWork(workId);
+  const prevWork = await getWork({ workId });
 
   isAuthorized(prevWork.workerId, userId, role);
 
@@ -126,7 +126,7 @@ async function updateWork({ workId, userId, role, content }) {
 }
 
 async function deleteWork({ workId, userId, role }) {
-  const prevWork = await getWork(workId);
+  const prevWork = await getWork({ workId });
 
   isAuthorized(prevWork.workerId, userId, role);
 

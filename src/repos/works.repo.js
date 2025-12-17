@@ -115,9 +115,9 @@ async function countWorksByChallengeId(challengeId, tx) {
   });
 }
 
-async function findWorkById(workId, tx) {
+async function findWorkById({ workId, userId }, tx) {
   const db = tx || prisma;
-  return db.work.findUnique({
+  const work = await db.work.findUnique({
     where: { id: Number(workId) },
     include: {
       worker: {
@@ -134,8 +134,20 @@ async function findWorkById(workId, tx) {
         },
         orderBy: { createdAt: 'desc' },
       },
+      likes: userId
+        ? {
+            where: { workId: Number(workId), userId: Number(userId) },
+          }
+        : false,
     },
   });
+
+  if (!work) return null;
+
+  const isLiked = !!(work.likes && work.likes.length > 0);
+  const { likes: _likes, ...rest } = work;
+
+  return { ...rest, isLiked };
 }
 
 async function updateWork({ workId, data }, tx) {
