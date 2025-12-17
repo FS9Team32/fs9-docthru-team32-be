@@ -214,8 +214,11 @@ router.get(
   async (req, res, next) => {
     try {
       const { applicationId } = req.params;
+      const { userId, role } = req.auth;
       const application = await applicationsServices.getApplicationById({
         applicationId: Number(applicationId),
+        userId,
+        role,
       });
       res.status(200).json({
         success: true,
