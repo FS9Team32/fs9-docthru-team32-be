@@ -13,16 +13,32 @@ async function closeExpiredChallenges() {
 
   for (const challenge of challenges) {
     await prisma.$transaction(async (tx) => {
-      const winner = await tx.work.findFirst({
+      // 1. 해당 챌린지의 최고 likeCount 가져오기
+      const maxLikeWork = await tx.work.findFirst({
         where: { challengeId: challenge.id },
         orderBy: [{ likeCount: 'desc' }],
       });
-      if (winner) {
-        await tx.work.update({
-          where: { id: winner.id },
-          data: { isSelected: true },
+
+      if (maxLikeWork) {
+        const maxLikeCount = maxLikeWork.likeCount;
+        // 2. 최고 likeCount를 가진 모든 work 찾기
+        const winners = await tx.work.findMany({
+          where: {
+            challengeId: challenge.id,
+            likeCount: maxLikeCount,
+          },
         });
+        // 3. 모든 winner를 selected 처리
+        await Promise.all(
+          winners.map((work) =>
+            tx.work.update({
+              where: { id: work.id },
+              data: { isSelected: true },
+            }),
+          ),
+        );
       }
+      // 4. 챌린지 상태를 CLOSED로
       await tx.challenge.update({
         where: { id: challenge.id },
         data: { status: 'CLOSED' },
